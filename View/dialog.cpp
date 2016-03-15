@@ -12,74 +12,103 @@ Dialog::Dialog(QWidget *parent) :
     ui->graphicsView->setBackgroundBrush(QBrush(QColor(240,240,239)));
 
     // Colors
+
+    std::vector<std::pair<QColor,QColor> >base_colors {
+        std::make_pair(QColor(92,170,119),QColor(185,219,125)), //G
+        std::make_pair(QColor(237,235,89),QColor(237,234,138)),  //Y
+        std::make_pair(QColor(92,93,170),QColor(111,111,170)),  //B
+        std::make_pair(QColor(237,57,60),QColor(237,114,125))   //R
+    };
+
     QBrush greenBrush(QColor(132,195,38));
     QBrush white(Qt::white);
-    QBrush redBrush(Qt::red);
-    QBrush blueBrush(Qt::blue);
     QPen blackPen(Qt::black);
     blackPen.setWidth(1);
-    QPen GreenStart(QColor(92,170,119));
-    GreenStart.setWidth(2);
+//    QPen GreenStart(QColor(92,170,119));
+//    GreenStart.setWidth(2);
 
     // Cross
-    scene->addRect(15,245,1000,140,blackPen,QBrush(QColor(195,195,194)));
-    scene->addRect(415,-155,160,400,blackPen,QBrush(QColor(195,195,194)));
-    scene->addRect(415,385,160,400,blackPen,QBrush(QColor(195,195,194)));
+    scene->addRect(415,-155,160,960,blackPen,QBrush(QColor(195,195,194)));
+    scene->addRect(15,245,960,160,blackPen,QBrush(QColor(195,195,194)));
+    scene->addRect(415,245,160,160,QPen(QColor(195,195,194)),QBrush(QColor(195,195,194))); //clean center
 
     // Goal stretch
-    scene->addRect(50,280,350,70,blackPen,greenBrush);
-    scene->addEllipse(60,290,50,50,blackPen,white);
-    scene->addEllipse(130,290,50,50,blackPen,white);
-    scene->addEllipse(200,290,50,50,blackPen,white);
-    scene->addEllipse(270,290,50,50,blackPen,white);
-    scene->addEllipse(340,290,50,50,blackPen,white);
+    scene->addRect(50,290,350,70,blackPen,QBrush(base_colors[0].first));
+    scene->addRect(460,-120,70,350,blackPen,QBrush(base_colors[1].first));
+    scene->addRect(590,290,350,70,blackPen,QBrush(base_colors[2].first));
+    scene->addRect(460,420,70,350,blackPen,QBrush(base_colors[3].first));
 
-    // Green home
-    addHomeField(0,0,greenBrush);
+    int x_pos = -10; //start place for green
+    int y_pos = 220;
+    int offset = 70;
+    int small_offset = 50;
+    int large_offset = 80;
+
+    for(int x=60; x<=340; x+=offset)
+        scene->addEllipse(x,300,50,50,blackPen,white);
+    for(int y=-110; y<=170; y+=offset)
+        scene->addEllipse(470,y,50,50,blackPen,white);
+    for(int x=600; x<=950; x+=offset)
+        scene->addEllipse(x,300,50,50,blackPen,white);
+    for(int y=430; y<=780; y+=offset)
+        scene->addEllipse(470,y,50,50,blackPen,white);
+
+    //home fields
+    addHomeField(0,0,QBrush(base_colors[0].first));
+    addHomeField(630,-170,QBrush(base_colors[1].first));
+    addHomeField(800,445,QBrush(base_colors[2].first));
+    addHomeField(190,630,QBrush(base_colors[3].first));
 
     // Playing fields
-    std::vector<std::pair<int,int> > fieldPos {
-        // 51,0-4
-        std::make_pair(-10,220),
-        std::make_pair(60,220),
-        std::make_pair(130,220),
-        std::make_pair(200,220),
-        std::make_pair(270,220),
-        std::make_pair(340,220),
-        // 5-10
-        std::make_pair(390,170),
-        std::make_pair(390,100),
-        std::make_pair(390,30),
-        std::make_pair(390,-40),
-        std::make_pair(390,-110),
-        std::make_pair(390,-180),
-        // 11
-        // 12-17
-        // 18-23
-        // 24
-        // 25-30
-        // 31-36
-        // 37
-        // 38-43
-        // 44-49
-        std::make_pair(340,360),
-        std::make_pair(270,360),
-        std::make_pair(200,360),
-        std::make_pair(130,360),
-        std::make_pair(60,360),
-        std::make_pair(-10,360),
-        // 50
-        std::make_pair(-10,290)
-    };
+    // x,y
+    std::vector<std::pair<int,int> > fieldPos;
+
+
+    std::vector<std::pair<char,char> > directions{std::make_pair(1,-1),std::make_pair(1,1),std::make_pair(-1,1),std::make_pair(-1,-1) };
+    for(size_t d =0; d < directions.size(); ++d){
+        for(int i=0; i<5;++i){
+            if(d % 2 == 0)
+                x_pos += directions[d].first * offset;
+            else
+                y_pos += directions[d].second * offset;
+            fieldPos.push_back(std::make_pair(x_pos,y_pos));
+        }
+        x_pos += directions[d].first * small_offset;
+        y_pos += directions[d].second * small_offset;
+        for(int i=0; i<5;++i){
+            fieldPos.push_back(std::make_pair(x_pos,y_pos));
+            if(d % 2 == 0)
+                y_pos += directions[d].second * offset;
+            else
+                x_pos += directions[d].first * offset;
+        }
+        for(int i=0; i<2;++i){
+            fieldPos.push_back(std::make_pair(x_pos,y_pos));
+            if(d % 2 == 0)
+                x_pos += directions[d].first * large_offset;
+            else
+                y_pos += directions[d].second * large_offset;
+        }
+        fieldPos.push_back(std::make_pair(x_pos,y_pos));
+    }
+
+    for(size_t c = 0; c < base_colors.size(); ++c){
+        scene->addEllipse(fieldPos[0+13*c].first,fieldPos[0+13*c].second,50,50,QPen(base_colors[c].first),QBrush(base_colors[c].second));
+        for(int i=1; i < 13; ++i){
+            std::cout << fieldPos[i+13*c].first << "," << fieldPos[i+13*c].second << std::endl;
+            scene->addEllipse(fieldPos[i+13*c].first,fieldPos[i+13*c].second,50,50,blackPen,white);
+        }
+    }
+    /*
     for(unsigned int i = 0; i < fieldPos.size(); i++){
         std::cout << fieldPos[i].first << "," << fieldPos[i].second << std::endl;
-        if(i == 1){
+        if(i % 13 == 0){
             scene->addEllipse(fieldPos[i].first,fieldPos[i].second,50,50,GreenStart,QBrush(QColor(185,219,125)));
         }else{
             scene->addEllipse(fieldPos[i].first,fieldPos[i].second,50,50,blackPen,white);
         }
     }
-
+    */
     //ui->graphicsView->fitInView(scene->itemsBoundingRect(),Qt::KeepAspectRatio);
 }
 
@@ -95,6 +124,7 @@ void Dialog::showEvent(QShowEvent *) {
 void Dialog::resizeEvent(QResizeEvent *){
     ui->graphicsView->fitInView(scene->itemsBoundingRect(),Qt::KeepAspectRatio);
 }
+
 
 void Dialog::addHomeField(int x, int y,QBrush brush){
     QBrush whiteBrush(Qt::white);

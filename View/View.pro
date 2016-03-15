@@ -19,4 +19,4 @@ HEADERS  += dialog.h
 
 FORMS    += dialog.ui
 
-CONFIG += c++11
+QMAKE_CXXFLAGS += -std=c++11 -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -Wunused

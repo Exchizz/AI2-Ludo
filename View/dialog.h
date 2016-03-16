@@ -20,6 +20,11 @@ class Dialog : public QDialog
 public:
     explicit Dialog(QWidget *parent = 0);
     ~Dialog();
+    void move_goal(int color);
+    void move_home(int color);
+    void move_piece(int piece_index,int field_index){
+        graphic_player[piece_index]->setPos(fieldPos[field_index]);
+    }
 
 private:
     void addHomeField(int,int,QBrush);

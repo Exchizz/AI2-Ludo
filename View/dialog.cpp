@@ -24,8 +24,9 @@ Dialog::Dialog(QWidget *parent) :
     QBrush white(Qt::white);
     QPen blackPen(Qt::black);
     blackPen.setWidth(1);
-//    QPen GreenStart(QColor(92,170,119));
-//    GreenStart.setWidth(2);
+
+    QBrush globe_color(QColor(Qt::red));
+    QBrush star_color(QColor(Qt::yellow));
 
     // Cross
     scene->addRect(415,-155,160,960,blackPen,QBrush(QColor(195,195,194)));
@@ -44,15 +45,6 @@ Dialog::Dialog(QWidget *parent) :
     int small_offset = 50;
     int large_offset = 80;
 
-    for(int x=60; x<=340; x+=offset)
-        scene->addEllipse(x,300,50,50,blackPen,white);
-    for(int y=-110; y<=170; y+=offset)
-        scene->addEllipse(470,y,50,50,blackPen,white);
-    for(int x=600; x<=950; x+=offset)
-        scene->addEllipse(x,300,50,50,blackPen,white);
-    for(int y=430; y<=780; y+=offset)
-        scene->addEllipse(470,y,50,50,blackPen,white);
-
     //home fields
     addHomeField(0,0,QBrush(base_colors[0].first));
     addHomeField(630,-170,QBrush(base_colors[1].first));
@@ -60,9 +52,7 @@ Dialog::Dialog(QWidget *parent) :
     addHomeField(190,630,QBrush(base_colors[3].first));
 
     // Playing fields
-    // x,y
-    std::vector<std::pair<int,int> > fieldPos;
-
+    std::vector<QPointF> fieldPos;
 
     std::vector<std::pair<char,char> > directions{std::make_pair(1,-1),std::make_pair(1,1),std::make_pair(-1,1),std::make_pair(-1,-1) };
     for(size_t d =0; d < directions.size(); ++d){
@@ -71,46 +61,56 @@ Dialog::Dialog(QWidget *parent) :
                 x_pos += directions[d].first * offset;
             else
                 y_pos += directions[d].second * offset;
-            fieldPos.push_back(std::make_pair(x_pos,y_pos));
+            fieldPos.push_back(QPointF(x_pos,y_pos));
         }
         x_pos += directions[d].first * small_offset;
         y_pos += directions[d].second * small_offset;
         for(int i=0; i<5;++i){
-            fieldPos.push_back(std::make_pair(x_pos,y_pos));
+            fieldPos.push_back(QPointF(x_pos,y_pos));
             if(d % 2 == 0)
                 y_pos += directions[d].second * offset;
             else
                 x_pos += directions[d].first * offset;
         }
         for(int i=0; i<2;++i){
-            fieldPos.push_back(std::make_pair(x_pos,y_pos));
+            fieldPos.push_back(QPointF(x_pos,y_pos));
             if(d % 2 == 0)
                 x_pos += directions[d].first * large_offset;
             else
                 y_pos += directions[d].second * large_offset;
         }
-        fieldPos.push_back(std::make_pair(x_pos,y_pos));
+        fieldPos.push_back(QPointF(x_pos,y_pos));
     }
 
+    //goal stretches
+    for(int x=60; x<=340; x+=offset)
+        fieldPos.push_back(QPointF(x,300));
+    for(int y=-110; y<=170; y+=offset)
+        fieldPos.push_back(QPointF(470,y));
+    for(int x=600; x<=950; x+=offset)
+        fieldPos.push_back(QPointF(x,300));
+    for(int y=430; y<=780; y+=offset)
+        fieldPos.push_back(QPointF(470,y));
+
     for(size_t c = 0; c < base_colors.size(); ++c){
-        scene->addEllipse(fieldPos[0+13*c].first,fieldPos[0+13*c].second,50,50,QPen(base_colors[c].first),QBrush(base_colors[c].second));
+        scene->addEllipse(fieldPos[0+13*c].x(),fieldPos[0+13*c].y(),50,50,QPen(base_colors[c].first),QBrush(base_colors[c].second));
         for(int i=1; i < 13; ++i){
-            std::cout << fieldPos[i+13*c].first << "," << fieldPos[i+13*c].second << std::endl;
-            scene->addEllipse(fieldPos[i+13*c].first,fieldPos[i+13*c].second,50,50,blackPen,white);
+//            std::cout << fieldPos[i+13*c].first << "," << fieldPos[i+13*c].second << std::endl;
+            if(i % 8 == 0)
+                scene->addEllipse(fieldPos[i+13*c].x(),fieldPos[i+13*c].y(),50,50,blackPen,globe_color);
+            else if(i == 5 )
+                scene->addEllipse(fieldPos[i+13*c].x(),fieldPos[i+13*c].y(),50,50,blackPen,star_color);
+            else if(i == 11)
+                scene->addEllipse(fieldPos[i+13*c].x(),fieldPos[i+13*c].y(),50,50,blackPen,star_color);
+            else
+                scene->addEllipse(fieldPos[i+13*c].x(),fieldPos[i+13*c].y(),50,50,blackPen,white);
         }
     }
-    /*
-    for(unsigned int i = 0; i < fieldPos.size(); i++){
-        std::cout << fieldPos[i].first << "," << fieldPos[i].second << std::endl;
-        if(i % 13 == 0){
-            scene->addEllipse(fieldPos[i].first,fieldPos[i].second,50,50,GreenStart,QBrush(QColor(185,219,125)));
-        }else{
-            scene->addEllipse(fieldPos[i].first,fieldPos[i].second,50,50,blackPen,white);
-        }
+    for(size_t g = 52; g < fieldPos.size(); ++g){
+        scene->addEllipse(fieldPos[g].x(),fieldPos[g].y(),50,50,blackPen,white);
     }
-    */
-    //ui->graphicsView->fitInView(scene->itemsBoundingRect(),Qt::KeepAspectRatio);
 }
+
 
 Dialog::~Dialog()
 {
@@ -124,7 +124,6 @@ void Dialog::showEvent(QShowEvent *) {
 void Dialog::resizeEvent(QResizeEvent *){
     ui->graphicsView->fitInView(scene->itemsBoundingRect(),Qt::KeepAspectRatio);
 }
-
 
 void Dialog::addHomeField(int x, int y,QBrush brush){
     QBrush whiteBrush(Qt::white);

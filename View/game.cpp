@@ -4,7 +4,12 @@ game::game(){
     for(int i=0; i < 16; ++i){
         player_positions.push_back(-1);
     }
-    player_positions[2] = 55;
+    player_positions[0] = 0;
+    player_positions[4] = 13;
+    player_positions[8] = 26;
+    player_positions[12] = 39;
+    rollDice();
+    color = 3;
 }
 
 int game::rel_to_fixed(int relative_piece_index){
@@ -28,9 +33,11 @@ int game::isStar(int index){
 
 int game::isOccupied(int index){ //returns number of people
     int number_of_people = 0;
-    for(auto i : player_positions){
-        if(i == index){
-            ++number_of_people;
+    if(index != 99){
+        for(auto i : player_positions){
+            if(i == index){
+                ++number_of_people;
+            }
         }
     }
     return number_of_people;
@@ -58,47 +65,82 @@ void game::move_start(int fixed_piece){
         player_positions[fixed_piece] = color*13; //move me to start
         send_them_home(color*13); //send pieces home if they are on our start
     } else {
-        std::cerr << "Invalid move!\n";
+        std::cerr << "Invalid move!" << std::endl;
     }
 }
 
+int game::next_turn(std::vector<int> &relative_pos, int &dice){
+    switch(color){
+        case 0:
+        case 1:
+        case 2:
+            ++color;
+            break;
+        case 3:
+        default:
+            color = 0;
+            break;
+    }
+    rollDice();
+    dice = getDiceRoll();
+    relative_pos = relativePosition();
+    return 0;
+}
+
 void game::movePiece(int relative_piece){
+    if(relative_piece == -1){
+        std::cerr << "\n\n\n GAME WON \n\n" << std::endl;
+        return;
+    }
     int fixed_piece = rel_to_fixed(relative_piece);
     int modifier = color * 13;
     int relative = player_positions[fixed_piece];
     int target_pos;
-
+std::cout << "p: " << color << " " << dice_result << " ";
     if(player_positions[fixed_piece] == -1){
         move_start(fixed_piece);
+std::cout << "all_posis: " << player_positions[color * 4] << " "
+          << player_positions[color * 4 + 1 ] << " "
+          << player_positions[color * 4 + 2 ] << " "
+          << player_positions[color * 4 + 3 ] << "\n";
     } else {
         //convert to relative position
+std::cout << "fix: " << relative << " ";
         if(relative < modifier)
             relative = relative + 52 - modifier;
-        else if(relative > modifier)
-            relative = relative - modifier;
-        else if(relative + modifier > 50)
+        else if( (relative - modifier) > 50)
             relative = relative - color * 5;
+        else //if(relative >= modifier)
+            relative = relative - modifier;
 
+std::cout << "pos: " << relative << " ";
         //add dice roll
         relative += dice_result;
-        int jump = isStar(relative); //return 0 | 6 | 7
 
-        if(jump + relative == 57){
-            relative = 56;
-        } else {
-            relative += jump;
+std::cout << relative << " ";
+
+        int jump = isStar(relative); //return 0 | 6 | 7
+        if(jump){
+            if(jump + relative == 57){
+                relative = 56;
+            } else {
+                relative += jump;
+            }
         }
         //special case checks
-        if(relative > 56) // go back
-                target_pos = 56-(relative-56) + color * 5; //trust me
-        else if(relative > 50) // goal stretch
-                target_pos = relative + color * 5;
-        else if(relative == 56){
+        if(relative > 56){ // go back
+std::cout << "go back ";
+            target_pos = 56-(relative-56) + color * 5; //trust me
+        }else if(relative == 56){
+std::cout << "GOAL!!! ";
             target_pos = 99;
-        }
-        else
+        }else if(relative > 50){ // goal stretch
+std::cout << "goal stretch ";
+            target_pos = relative + color * 5;
+        } else {
+std::cout << "normal move ";
             target_pos = relative + color * 13;
-
+        }
         //check for game stuff
 
         if(isOccupied(target_pos)){
@@ -110,6 +152,7 @@ void game::movePiece(int relative_piece){
         }
 
         //move piece
+        std::cout << "moved the piece " << fixed_piece << " " << target_pos - player_positions[fixed_piece] << " end: " << target_pos << std::endl;
         player_positions[fixed_piece] = target_pos;
     }
 }

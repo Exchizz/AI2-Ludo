@@ -133,6 +133,7 @@ void Dialog::update_graphics(){
             graphic_player[i]->setPos(fieldPos[player_positions[i]]);
         }
     }
+    ui->graphicsView->repaint();
 }
 
 void Dialog::create_graphic_players(){

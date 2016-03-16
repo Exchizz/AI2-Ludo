@@ -9,7 +9,6 @@
 class game {
 private:
     int dice_result;
-    int color;
     std::vector<int> relativePosition();
     int isStar(int index);
     bool isGlobe(int index);
@@ -18,6 +17,7 @@ private:
     void send_them_home(int index);
     void move_start(int fixed_piece);
 public:
+    int color;
     std::vector<int> player_positions;
     void rollDice(){
         std::random_device rd;
@@ -26,7 +26,7 @@ public:
         dice_result = dis(gen);
     }
     int getDiceRoll() {return dice_result; }
-    int give_turn(std::vector<int> relative_positions, int dice);
+    int next_turn(std::vector<int> &relative_pos, int &dice);
     game();
     void movePiece(int piece); //check game rules
 

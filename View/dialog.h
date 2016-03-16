@@ -8,12 +8,13 @@
 #include <QtCore>
 #include <QtGui>
 #include <QGraphicsScene>
+#include "game.h"
 
 namespace Ui {
 class Dialog;
 }
 
-class Dialog : public QDialog
+class Dialog : public QDialog, public game
 {
     Q_OBJECT
 
@@ -22,10 +23,8 @@ public:
     ~Dialog();
     void move_goal(int color);
     void move_home(int color);
-    void move_piece(int piece_index,int field_index){
-        graphic_player[piece_index]->setPos(fieldPos[field_index]);
-    }
-
+    void move_piece(int piece_index,int field_index);
+    void update_graphics();
 private:
     void addHomeField(int,int,QBrush);
     void showEvent(QShowEvent *);
@@ -34,6 +33,11 @@ private:
     QGraphicsScene *scene;
     QGraphicsEllipseItem *ellipse;
     QGraphicsRectItem *rectangle;
+    void create_graphic_players();
+    std::vector<QGraphicsEllipseItem *> graphic_player;
+    std::vector<QPointF> home_fields;
+    std::vector<QPointF> fieldPos;
+
 };
 
 #endif // DIALOG_H

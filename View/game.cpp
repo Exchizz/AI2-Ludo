@@ -1,22 +1,10 @@
 #include "game.h"
 
 game::game(){
-    QBrush piece;
-    QPen blackPen(Qt::black);
-    blackPen.setWidth(1);
-    for(int c = 0; c<4; ++c){
-        if(c == 0){
-            piece = QBrush(QColor(Qt::green));
-        } else if(c == 1){
-            piece = QBrush(QColor(Qt::yellow));
-        } else if(c == 2){
-            piece = QBrush(QColor(Qt::red));
-        } else if(c == 3){
-            piece = QBrush(QColor(Qt::blue));
-        }
-        for(int i = 0; i<4; ++i)
-            graphic_player.push_back(scene->addEllipse(5,5,40,40,blackPen,piece));
+    for(int i=0; i < 16; ++i){
+        player_positions.push_back(-1);
     }
+    player_positions[2] = 55;
 }
 
 int game::rel_to_fixed(int relative_piece_index){
@@ -52,10 +40,11 @@ bool game::isGlobe(int index){
     if(index % 13 == 0 || (index - 8) % 13 == 0 || isOccupied(index) > 1){
         return true;
     }
+    return false;
 }
 
 void game::send_them_home(int index){
-    for(size_t i = 0; i < player_positions; ++i){
+    for(size_t i = 0; i < player_positions.size(); ++i){
         if(i < color*4 || i > color*4 + 4){ //different color
             if(player_positions[i] == index){
                 player_positions[i] = -1;
@@ -104,6 +93,9 @@ void game::movePiece(int relative_piece){
                 target_pos = 56-(relative-56) + color * 5; //trust me
         else if(relative > 50) // goal stretch
                 target_pos = relative + color * 5;
+        else if(relative == 56){
+            target_pos = 99;
+        }
         else
             target_pos = relative + color * 13;
 
@@ -119,16 +111,6 @@ void game::movePiece(int relative_piece){
 
         //move piece
         player_positions[fixed_piece] = target_pos;
-    }
-    //update graphic
-    for(auto i : player_positions){
-        if(i == -1){
-//            move_home()
-        } else if(i == 56){
-//            move_goal();
-        } else {
-//            move_piece(fixed_piece, i);
-        }
     }
 }
 

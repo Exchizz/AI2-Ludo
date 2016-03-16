@@ -46,14 +46,15 @@ Dialog::Dialog(QWidget *parent) :
     int large_offset = 80;
 
     //home fields
-    addHomeField(0,0,QBrush(base_colors[0].first));
-    addHomeField(630,-170,QBrush(base_colors[1].first));
-    addHomeField(800,445,QBrush(base_colors[2].first));
-    addHomeField(190,630,QBrush(base_colors[3].first));
+    home_fields.push_back(QPointF(0,0));
+    home_fields.push_back(QPointF(630,-170));
+    home_fields.push_back(QPointF(800,445));
+    home_fields.push_back(QPointF(190,630));
+    for(size_t f = 0; f < home_fields.size(); ++f){
+        addHomeField(home_fields[f].x(),home_fields[f].y(),QBrush(base_colors[f].first));
+    }
 
     // Playing fields
-    std::vector<QPointF> fieldPos;
-
     std::vector<std::pair<char,char> > directions{std::make_pair(1,-1),std::make_pair(1,1),std::make_pair(-1,1),std::make_pair(-1,-1) };
     for(size_t d =0; d < directions.size(); ++d){
         for(int i=0; i<5;++i){
@@ -109,6 +110,50 @@ Dialog::Dialog(QWidget *parent) :
     for(size_t g = 52; g < fieldPos.size(); ++g){
         scene->addEllipse(fieldPos[g].x(),fieldPos[g].y(),50,50,blackPen,white);
     }
+    create_graphic_players();
+}
+
+void Dialog::update_graphics(){
+    QPointF p;
+    for(size_t i = 0; i < player_positions.size(); ++i){
+        if(player_positions[i] == -1){
+            p = home_fields[i / 4];
+            if(i % 4 == 0)
+                graphic_player[i]->setPos(p.x()+65 ,p.y()+15 );
+            else if(i % 4 == 1)
+                graphic_player[i]->setPos(p.x()+65 ,p.y()+115);
+            else if(i % 4 == 2)
+                graphic_player[i]->setPos(p.x()+15 ,p.y()+65 );
+            else if(i % 4 == 3)
+                graphic_player[i]->setPos(p.x()+115,p.y()+65 );
+
+        } else if(player_positions[i] == 99){
+            graphic_player[i]->setPos(470,470);
+        } else {
+            graphic_player[i]->setPos(fieldPos[player_positions[i]]);
+        }
+    }
+}
+
+void Dialog::create_graphic_players(){
+    graphic_player.clear();
+    QBrush piece;
+    QPen blackPen(Qt::black);
+    blackPen.setWidth(1);
+    for(int c = 0; c<4; ++c){
+        if(c == 0){
+            piece = QBrush(QColor(Qt::green));
+        } else if(c == 1){
+            piece = QBrush(QColor(Qt::yellow));
+        } else if(c == 2){
+            piece = QBrush(QColor(Qt::blue));
+        } else if(c == 3){
+            piece = QBrush(QColor(Qt::red));
+        }
+        for(int i = 0; i<4; ++i){
+            graphic_player.push_back(scene->addEllipse(5,5,40,40,blackPen,piece));
+        }
+    }
 }
 
 
@@ -123,6 +168,7 @@ void Dialog::showEvent(QShowEvent *) {
 
 void Dialog::resizeEvent(QResizeEvent *){
     ui->graphicsView->fitInView(scene->itemsBoundingRect(),Qt::KeepAspectRatio);
+    update_graphics();
 }
 
 void Dialog::addHomeField(int x, int y,QBrush brush){
@@ -131,8 +177,8 @@ void Dialog::addHomeField(int x, int y,QBrush brush){
     blackPen.setWidth(1);
 
     scene->addEllipse(x,y,180,180,blackPen,brush);
-    scene->addEllipse(x+65,y+15,50,50,blackPen,whiteBrush);
-    scene->addEllipse(x+65,y+115,50,50,blackPen,whiteBrush);
-    scene->addEllipse(x+15,y+65,50,50,blackPen,whiteBrush);
-    scene->addEllipse(x+115,y+65,50,50,blackPen,whiteBrush);
+    scene->addEllipse(x+65 ,y+15 ,50,50,blackPen,whiteBrush);
+    scene->addEllipse(x+65 ,y+115,50,50,blackPen,whiteBrush);
+    scene->addEllipse(x+15 ,y+65 ,50,50,blackPen,whiteBrush);
+    scene->addEllipse(x+115,y+65 ,50,50,blackPen,whiteBrush);
 }

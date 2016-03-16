@@ -9,7 +9,7 @@ game::game(){
     player_positions[8] = 26;
     player_positions[12] = 39;
     rollDice();
-    color = 3;
+    color = 2;
 }
 
 int game::rel_to_fixed(int relative_piece_index){
@@ -17,7 +17,7 @@ int game::rel_to_fixed(int relative_piece_index){
 }
 
 int game::isStar(int index){
-    if(index == 5 ||
+    if(index == 5  ||
        index == 18 ||
        index == 31 ||
        index == 44){
@@ -95,7 +95,7 @@ void game::movePiece(int relative_piece){
     int fixed_piece = rel_to_fixed(relative_piece);
     int modifier = color * 13;
     int relative = player_positions[fixed_piece];
-    int target_pos;
+    int target_pos = 0;
 std::cout << "p: " << color << " " << dice_result << " ";
     if(player_positions[fixed_piece] == -1){
         move_start(fixed_piece);
@@ -106,13 +106,15 @@ std::cout << "all_posis: " << player_positions[color * 4] << " "
     } else {
         //convert to relative position
 std::cout << "fix: " << relative << " ";
-        if(relative < modifier)
+        if(relative == 99){
+            std::cout << "I tought this would be it ";
+        } else if(relative < modifier) {
             relative = relative + 52 - modifier;
-        else if( (relative - modifier) > 50)
+        } else if( (relative - modifier) > 50) {
             relative = relative - color * 5;
-        else //if(relative >= modifier)
+        } else {//if(relative >= modifier)
             relative = relative - modifier;
-
+        }
 std::cout << "pos: " << relative << " ";
         //add dice roll
         relative += dice_result;
@@ -128,15 +130,15 @@ std::cout << relative << " ";
             }
         }
         //special case checks
-        if(relative > 56){ // go back
+        if(relative > 56 && relative < 72){ // go back
 std::cout << "go back ";
             target_pos = 56-(relative-56) + color * 5; //trust me
-        }else if(relative == 56){
+        }else if(relative == 56 || relative >= 99){
 std::cout << "GOAL!!! ";
             target_pos = 99;
         }else if(relative > 50){ // goal stretch
 std::cout << "goal stretch ";
-            target_pos = relative + color * 5;
+            target_pos = relative + color * 5 + 1;
         } else {
 std::cout << "normal move ";
             target_pos = relative + color * 13;
@@ -151,22 +153,41 @@ std::cout << "normal move ";
             }
         }
 
+        if(target_pos - player_positions[fixed_piece] == 0){
+            std::cout << "\rall_posis: " << player_positions[color * 4] << " "
+                      << player_positions[color * 4 + 1 ] << " "
+                      << player_positions[color * 4 + 2 ] << " "
+                      << player_positions[color * 4 + 3 ] << "\n";
+        } else {
         //move piece
         std::cout << "moved the piece " << fixed_piece << " " << target_pos - player_positions[fixed_piece] << " end: " << target_pos << std::endl;
+        }
         player_positions[fixed_piece] = target_pos;
     }
 }
 
 std::vector<int> game::relativePosition(){
-    std::vector<int> relative_positons = player_positions;
+    std::vector<int> relative_positons;
     int modifier = color * 13;
-    for(size_t i = 0; i < player_positions.size(); ++i){
-        if(relative_positons[i] < modifier)
-            relative_positons[i] = relative_positons[i] + 52 - modifier;
-        else if(relative_positons[i] > modifier)
-            relative_positons[i] = relative_positons[i] - modifier;
-        else if(relative_positons[i] + modifier > 50)
-            relative_positons[i] = relative_positons[i] - color * 5;
+
+    //from start id to end
+    for(int i = color*4; i < player_positions.size(); ++i){
+        relative_positons.push_back(player_positions[i]);
+    }
+    //from 0 to start id
+    for(int i = 0; i < color*4; ++i){
+        relative_positons.push_back(player_positions[i]);
+    }
+    for(size_t i = 0; i < relative_positons.size(); ++i){
+        if(relative_positons[i] == 99 || relative_positons[i] == -1){
+            relative_positons[i] = (relative_positons[i]);
+        } else if(relative_positons[i] < modifier) {
+            relative_positons[i] = (relative_positons[i]+52-modifier);
+        } else if(relative_positons[i] > modifier) {
+            relative_positons[i] = (relative_positons[i]-modifier);
+        } else if(relative_positons[i] + modifier > 50) {
+            relative_positons[i] = (relative_positons[i]-color*5);
+        }
     }
     return std::move(relative_positons);
 }

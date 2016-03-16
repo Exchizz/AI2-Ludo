@@ -28,6 +28,7 @@ int simple_player(std::vector<int> relative_pos, int dice){
             }
         }
     }
+
     return -1; //no valid moves
 }
 
@@ -38,12 +39,18 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     Dialog w;
     w.show();
-    int iter = 100;
+    int iter = 200;
     while(iter--){
+        w.next_turn(relative_pos, dice);
+        w.next_turn(relative_pos, dice);
+        w.next_turn(relative_pos, dice);
         w.next_turn(relative_pos, dice);
         w.movePiece(simple_player(relative_pos, dice));
         w.update_graphics();
     }
-
+    for(auto i : relative_pos){
+        std::cout << i << " ";
+    }
+    std::cout << std::endl;
     return a.exec();
 }

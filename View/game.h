@@ -29,7 +29,6 @@ public:
     int next_turn(std::vector<int> &relative_pos, int &dice);
     game();
     void movePiece(int piece); //check game rules
-
 };
 
 #endif // GAME_H

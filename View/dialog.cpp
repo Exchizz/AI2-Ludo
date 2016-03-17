@@ -118,6 +118,8 @@ Dialog::Dialog(QWidget *parent) :
         scene->addEllipse(fieldPos[g].x(),fieldPos[g].y(),50,50,blackPen,white);
     }
     create_graphic_players();
+    std::vector<int> init_pos(16,-1);
+    update_graphics(init_pos);
 }
 
 void Dialog::update_graphics(std::vector<int> player_positions){
@@ -136,13 +138,25 @@ void Dialog::update_graphics(std::vector<int> player_positions){
 
         } else if(player_positions[i] == 99){
             if(i/4 == 0){
-                graphic_player[i]->setPos(435,300);
+                if(i % 4 == 0)      graphic_player[i]->setPos(405,300); //left
+                else if(i % 4 == 1) graphic_player[i]->setPos(405,270);
+                else if(i % 4 == 2) graphic_player[i]->setPos(405,330);
+                else if(i % 4 == 3) graphic_player[i]->setPos(435,300);
             } else if(i/4 == 1){
-                graphic_player[i]->setPos(470,265);
+                if(i % 4 == 0)      graphic_player[i]->setPos(470,235); //up
+                else if(i % 4 == 1) graphic_player[i]->setPos(440,235);
+                else if(i % 4 == 2) graphic_player[i]->setPos(500,235);
+                else if(i % 4 == 3) graphic_player[i]->setPos(470,265);
             } else if(i/4 == 2){
-                graphic_player[i]->setPos(505,300);
+                if(i % 4 == 0)      graphic_player[i]->setPos(535,300); //right
+                else if(i % 4 == 1) graphic_player[i]->setPos(535,270);
+                else if(i % 4 == 2) graphic_player[i]->setPos(535,330);
+                else if(i % 4 == 3) graphic_player[i]->setPos(505,300);
             } else if(i/4 == 3){
-                graphic_player[i]->setPos(470,335);
+                if(i % 4 == 0)      graphic_player[i]->setPos(470,365); //down
+                else if(i % 4 == 1) graphic_player[i]->setPos(440,365);
+                else if(i % 4 == 2) graphic_player[i]->setPos(500,365);
+                else if(i % 4 == 3) graphic_player[i]->setPos(470,335);
             }
         } else {
             graphic_player[i]->setPos(fieldPos[player_positions[i]]);
@@ -184,6 +198,12 @@ void Dialog::showEvent(QShowEvent *) {
 
 void Dialog::resizeEvent(QResizeEvent *){
     ui->graphicsView->fitInView(scene->itemsBoundingRect(),Qt::KeepAspectRatio);
+}
+
+void Dialog::get_winner(int color){
+    scene->addRect(0,500,1000,200,QPen(Qt::black,3,Qt::SolidLine,Qt::RoundCap, Qt::RoundJoin),QBrush(active_color));
+    QGraphicsSimpleTextItem * win = scene->addSimpleText(QString("Winner is found!"),QFont("Courier", 72, QFont::Bold, true));
+    win->setPos(50,550);
 }
 
 void Dialog::get_color(int color){

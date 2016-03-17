@@ -42,7 +42,7 @@ void ludo_player::post_game_analysis(std::vector<int> relative_pos){
     pos_end_of_turn = relative_pos;
     bool game_complete = true;
     for(int i = 0; i < 4; ++i){
-        if(pos_end_of_turn[i] != 99){
+        if(pos_end_of_turn[i] < 99){
             game_complete = false;
         }
     }

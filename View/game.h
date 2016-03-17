@@ -10,6 +10,8 @@
 
 #include "positions_and_dice.h"
 
+static int global_color = 5;
+
 class game : public QThread
 {
     Q_OBJECT
@@ -56,6 +58,7 @@ signals:
     void update_graphics(std::vector<int>);
     void set_color(int);
     void set_dice_result(int);
+    void declare_winner(int);
 
 public slots:
     void turnComplete(bool win);

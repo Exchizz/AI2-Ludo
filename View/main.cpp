@@ -5,36 +5,6 @@
 #include "ludo_player.h"
 #include "positions_and_dice.h"
 
-int simple_player(std::vector<int> relative_pos, int dice){
-    if(dice == 6){
-        for(int i = 0; i < 4; ++i){
-            if(relative_pos[i]<0){
-                return i;
-            }
-        }
-        for(int i = 0; i < 4; ++i){
-            if(relative_pos[i]>=0 && relative_pos[i] != 99){
-                return i;
-            }
-        }
-    } else {
-        for(int i = 0; i < 4; ++i){
-            if(relative_pos[i]>=0 && relative_pos[i] != 99){
-                return i;
-            }
-        }
-        for(int i = 0; i < 4; ++i){ //in case they are all locked in.
-            if(relative_pos[i]<0){
-                std::cout << "all is locked in" << std::endl;
-                return i;
-            }
-        }
-    }
-
-    return -1; //no valid moves
-}
-
-
 Q_DECLARE_METATYPE( positions_and_dice )
 
 int main(int argc, char *argv[])
@@ -44,13 +14,17 @@ int main(int argc, char *argv[])
     w.show();
     qRegisterMetaType<positions_and_dice>();
 
+    //instanciate the players here
     ludo_player p1, p2, p3, p4;
+
     game g;
-    g.setGameDelay(5000);
+    g.setGameDelay(000); //if you want to see the game, set a delay
 
     QObject::connect(&g,SIGNAL(update_graphics(std::vector<int>)),&w,SLOT(update_graphics(std::vector<int>)));
     QObject::connect(&g,SIGNAL(set_color(int)),&w,SLOT(get_color(int)));
     QObject::connect(&g,SIGNAL(set_dice_result(int)),&w,SLOT(get_dice_result(int)));
+    QObject::connect(&g,SIGNAL(declare_winner(int)),&w,SLOT(get_winner(int)));
+
 
     //set up for each player
     QObject::connect(&g,SIGNAL(player1_start(positions_and_dice)),&p1, SLOT(start_turn(positions_and_dice)));
@@ -75,12 +49,6 @@ int main(int argc, char *argv[])
 
     g.start();
 
-//    int iter = 200;
-//    while(iter--){
-//        w.next_turn(relative_pos, dice);
-//        w.movePiece(simple_player(relative_pos, dice));
-//        w.update_graphics();
-//    }
     std::cout << std::endl;
     return a.exec();
 }

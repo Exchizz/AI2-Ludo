@@ -11,8 +11,10 @@ Dialog::Dialog(QWidget *parent) :
     ui->graphicsView->setScene(scene);
     ui->graphicsView->setBackgroundBrush(QBrush(QColor(240,240,239)));
 
+    diceBG = scene->addRect(0,-150,100,100,QPen(Qt::black,3,Qt::SolidLine,Qt::RoundCap, Qt::RoundJoin),QBrush(Qt::green));
+    diceRoll = scene->addSimpleText(QString::number(0),QFont("Courier", 72, QFont::Bold, true));
+    diceRoll->setPos(25,-150);
     // Colors
-
     std::vector<std::pair<QColor,QColor> >base_colors {
         std::make_pair(QColor(92,170,119),QColor(185,219,125)), //G
         std::make_pair(QColor(237,235,89),QColor(237,234,138)),  //Y
@@ -20,7 +22,6 @@ Dialog::Dialog(QWidget *parent) :
         std::make_pair(QColor(237,57,60),QColor(237,114,125))   //R
     };
 
-    QBrush greenBrush(QColor(132,195,38));
     QBrush white(Qt::white);
     QPen blackPen(Qt::black);
     blackPen.setWidth(1);
@@ -177,6 +178,31 @@ void Dialog::showEvent(QShowEvent *) {
 
 void Dialog::resizeEvent(QResizeEvent *){
     ui->graphicsView->fitInView(scene->itemsBoundingRect(),Qt::KeepAspectRatio);
+}
+
+void Dialog::get_color(int color){
+    switch(color){
+        case 0:
+            active_color = Qt::green;
+            break;
+        case 1:
+            active_color = Qt::yellow;
+            break;
+        case 2:
+            active_color = Qt::blue;
+            break;
+        case 3:
+            active_color = Qt::red;
+        default:
+            break;
+    }
+}
+
+void Dialog::get_dice_result(int dice){
+    current_dice_roll = dice;
+    diceBG->setBrush(active_color);
+    diceRoll->setText(QString::number(current_dice_roll));
+    ui->graphicsView->repaint();
 }
 
 void Dialog::addHomeField(int x, int y,QBrush brush){

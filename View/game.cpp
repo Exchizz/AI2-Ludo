@@ -8,11 +8,11 @@ game::game(){
         player_positions.push_back(-1);
     }
     player_positions[0] = 0;
-    player_positions[4] = 13;
-    player_positions[8] = 26;
+//    player_positions[4] = 13;
+//    player_positions[8] = 26;
     player_positions[12] = 39;
     rollDice();
-    color = 2;
+    color = 3;
 }
 
 int game::rel_to_fixed(int relative_piece_index){
@@ -87,7 +87,10 @@ int game::next_turn(){
     rollDice();
     relative.dice = getDiceRoll();
     relative.pos = relativePosition();
+    emit set_color(color);
+    emit set_dice_result(dice_result);
 
+    msleep(game_delay - game_delay/4);
     switch(color){
         case 0:
             emit player1_start(relative);
@@ -114,7 +117,7 @@ void game::movePiece(int relative_piece){
     }
     int fixed_piece = rel_to_fixed(relative_piece);
     int modifier = color * 13;
-    int relative = player_positions[fixed_piece];
+    int relative_pos = player_positions[fixed_piece];
     int target_pos = 0;
 std::cout << "p: " << color << " " << dice_result << " ";
     if(player_positions[fixed_piece] == -1){
@@ -125,43 +128,49 @@ std::cout << "all_posis: " << player_positions[color * 4] << " "
           << player_positions[color * 4 + 3 ] << "\n";
     } else {
         //convert to relative position
-std::cout << "fix: " << relative << " ";
-        if(relative == 99){
+std::cout << "fix: " << relative_pos << " ";
+        if(relative_pos == 99){
             std::cout << "I tought this would be it ";
-        } else if(relative < modifier) {
-            relative = relative + 52 - modifier;
-        } else if( (relative - modifier) > 50) {
-            relative = relative - color * 5;
+        } else if(relative_pos < modifier) {
+            relative_pos = relative_pos + 52 - modifier;
+        } else if( (relative_pos - modifier) > 50) {
+            relative_pos = relative_pos - color * 5;
         } else {//if(relative >= modifier)
-            relative = relative - modifier;
+            relative_pos = relative_pos - modifier;
         }
-std::cout << "pos: " << relative << " ";
+std::cout << "pos: " << relative_pos << " ";
         //add dice roll
-        relative += dice_result;
+        relative_pos += dice_result;
 
-std::cout << relative << " ";
+std::cout << relative_pos << " ";
 
-        int jump = isStar(relative); //return 0 | 6 | 7
+        int jump = isStar(relative_pos); //return 0 | 6 | 7
         if(jump){
-            if(jump + relative == 57){
-                relative = 56;
+            if(jump + relative_pos == 57){
+                relative_pos = 56;
             } else {
-                relative += jump;
+                relative_pos += jump;
             }
         }
         //special case checks
-        if(relative > 56 && relative < 72){ // go back
+        if(relative_pos > 56 && relative_pos < 72){ // go back
 std::cout << "go back ";
-            target_pos = 56-(relative-56) + color * 5; //trust me
-        }else if(relative == 56 || relative >= 99){
+            target_pos = 56-(relative_pos-56) + color * 5; //trust me
+        }else if(relative_pos == 56 || relative_pos >= 99){
 std::cout << "GOAL!!! ";
             target_pos = 99;
-        }else if(relative > 50){ // goal stretch
+        }else if(relative_pos > 50){ // goal stretch
 std::cout << "goal stretch ";
-            target_pos = relative + color * 5 + 1;
+            target_pos = relative_pos + color * 5 + 1;
         } else {
 std::cout << "normal move ";
-            target_pos = relative + color * 13;
+            int new_pos = relative_pos + color * 13;
+            if(new_pos < 52){
+                target_pos = new_pos;
+            } else { //wrap around
+                target_pos = new_pos - 52;
+            }
+        //
         }
         //check for game stuff
 
@@ -184,20 +193,20 @@ std::cout << "normal move ";
         }
         player_positions[fixed_piece] = target_pos;
     }
-    std::vector<int> relative_pos = relativePosition();
+    std::vector<int> new_relative = relativePosition();
 
     switch(color){
         case 0:
-            emit player1_end(relative_pos);
+            emit player1_end(new_relative);
             break;
         case 1:
-            emit player2_end(relative_pos);
+            emit player2_end(new_relative);
             break;
         case 2:
-            emit player3_end(relative_pos);
+            emit player3_end(new_relative);
             break;
         case 3:
-            emit player4_end(relative_pos);
+            emit player4_end(new_relative);
         default:
             break;
     }
@@ -239,7 +248,7 @@ void game::run() {
     while(!game_complete){
         if(turn_complete){
             turn_complete = false;
-            msleep(game_delay);
+            msleep(game_delay/4);
             next_turn();
         }
     }

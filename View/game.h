@@ -54,6 +54,9 @@ signals:
     void player4_end(std::vector<int>);
 
     void update_graphics(std::vector<int>);
+    void set_color(int);
+    void set_dice_result(int);
+
 public slots:
     void turnComplete(bool win);
     void movePiece(int relative_piece); //check game rules

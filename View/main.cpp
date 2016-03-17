@@ -47,7 +47,10 @@ int main(int argc, char *argv[])
     ludo_player p1, p2, p3, p4;
     game g;
     g.setGameDelay(4000);
+
     QObject::connect(&g,SIGNAL(update_graphics(std::vector<int>)),&w,SLOT(update_graphics(std::vector<int>)));
+    QObject::connect(&g,SIGNAL(set_color(int)),&w,SLOT(get_color(int)));
+    QObject::connect(&g,SIGNAL(set_dice_result(int)),&w,SLOT(get_dice_result(int)));
 
     //set up for each player
     QObject::connect(&g,SIGNAL(player1_start(positions_and_dice)),&p1, SLOT(start_turn(positions_and_dice)));

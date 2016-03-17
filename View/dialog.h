@@ -23,6 +23,8 @@ public:
     explicit Dialog(QWidget *parent = 0);
     ~Dialog();
 private:
+    QColor active_color;
+    int current_dice_roll;
     void addHomeField(int,int,QBrush);
     void showEvent(QShowEvent *);
     void resizeEvent(QResizeEvent *);
@@ -32,10 +34,14 @@ private:
     QGraphicsRectItem *rectangle;
     void create_graphic_players();
     std::vector<QGraphicsEllipseItem *> graphic_player;
+    QGraphicsSimpleTextItem * diceRoll;
+    QGraphicsRectItem * diceBG;
     std::vector<QPointF> home_fields;
     std::vector<QPointF> fieldPos;
 public slots:
     void update_graphics(std::vector<int> player_positions);
+    void get_color(int color);
+    void get_dice_result(int dice);
 };
 
 #endif // DIALOG_H

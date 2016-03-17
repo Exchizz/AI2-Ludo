@@ -1,6 +1,9 @@
 #include "game.h"
 
 game::game(){
+    game_delay = 1000;
+    game_complete = false;
+    turn_complete = true;
     for(int i=0; i < 16; ++i){
         player_positions.push_back(-1);
     }
@@ -69,7 +72,7 @@ void game::move_start(int fixed_piece){
     }
 }
 
-int game::next_turn(std::vector<int> &relative_pos, int &dice){
+int game::next_turn(){
     switch(color){
         case 0:
         case 1:
@@ -82,8 +85,25 @@ int game::next_turn(std::vector<int> &relative_pos, int &dice){
             break;
     }
     rollDice();
-    dice = getDiceRoll();
-    relative_pos = relativePosition();
+    relative.dice = getDiceRoll();
+    relative.pos = relativePosition();
+
+    switch(color){
+        case 0:
+            emit player1_start(relative);
+            break;
+        case 1:
+            emit player2_start(relative);
+            break;
+        case 2:
+            emit player3_start(relative);
+            break;
+        case 3:
+            emit player4_start(relative);
+        default:
+            break;
+    }
+
     return 0;
 }
 
@@ -164,6 +184,24 @@ std::cout << "normal move ";
         }
         player_positions[fixed_piece] = target_pos;
     }
+    std::vector<int> relative_pos = relativePosition();
+
+    switch(color){
+        case 0:
+            emit player1_end(relative_pos);
+            break;
+        case 1:
+            emit player2_end(relative_pos);
+            break;
+        case 2:
+            emit player3_end(relative_pos);
+            break;
+        case 3:
+            emit player4_end(relative_pos);
+        default:
+            break;
+    }
+    emit update_graphics(player_positions);
 }
 
 std::vector<int> game::relativePosition(){
@@ -190,4 +228,19 @@ std::vector<int> game::relativePosition(){
         }
     }
     return std::move(relative_positons);
+}
+
+void game::turnComplete(bool win){
+    game_complete = win;
+    turn_complete = true;
+}
+
+void game::run() {
+    while(!game_complete){
+        if(turn_complete){
+            turn_complete = false;
+            msleep(game_delay);
+            next_turn();
+        }
+    }
 }

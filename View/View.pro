@@ -14,10 +14,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         dialog.cpp \
-    game.cpp
+    game.cpp \
+    ludo_player.cpp
 
 HEADERS  += dialog.h \
-    game.h
+    game.h \
+    ludo_player.h \
+    positions_and_dice.h
 
 FORMS    += dialog.ui
 

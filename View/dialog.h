@@ -9,22 +9,19 @@
 #include <QtGui>
 #include <QGraphicsScene>
 #include "game.h"
+#include <QGraphicsEllipseItem>
 
 namespace Ui {
 class Dialog;
 }
 
-class Dialog : public QDialog, public game
+class Dialog : public QDialog
 {
     Q_OBJECT
 
 public:
     explicit Dialog(QWidget *parent = 0);
     ~Dialog();
-    void move_goal(int color);
-    void move_home(int color);
-    void move_piece(int piece_index,int field_index);
-    void update_graphics();
 private:
     void addHomeField(int,int,QBrush);
     void showEvent(QShowEvent *);
@@ -37,7 +34,8 @@ private:
     std::vector<QGraphicsEllipseItem *> graphic_player;
     std::vector<QPointF> home_fields;
     std::vector<QPointF> fieldPos;
-
+public slots:
+    void update_graphics(std::vector<int> player_positions);
 };
 
 #endif // DIALOG_H

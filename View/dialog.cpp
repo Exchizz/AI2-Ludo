@@ -113,7 +113,7 @@ Dialog::Dialog(QWidget *parent) :
     create_graphic_players();
 }
 
-void Dialog::update_graphics(){
+void Dialog::update_graphics(std::vector<int> player_positions){
     QPointF p;
     for(size_t i = 0; i < player_positions.size(); ++i){
         if(player_positions[i] == -1){
@@ -128,7 +128,15 @@ void Dialog::update_graphics(){
                 graphic_player[i]->setPos(p.x()+115,p.y()+65 );
 
         } else if(player_positions[i] == 99){
-            graphic_player[i]->setPos(470,470);
+            if(i/4 == 0){
+                graphic_player[i]->setPos(435,300);
+            } else if(i/4 == 1){
+                graphic_player[i]->setPos(470,265);
+            } else if(i/4 == 2){
+                graphic_player[i]->setPos(505,300);
+            } else if(i/4 == 3){
+                graphic_player[i]->setPos(470,335);
+            }
         } else {
             graphic_player[i]->setPos(fieldPos[player_positions[i]]);
         }
@@ -169,7 +177,6 @@ void Dialog::showEvent(QShowEvent *) {
 
 void Dialog::resizeEvent(QResizeEvent *){
     ui->graphicsView->fitInView(scene->itemsBoundingRect(),Qt::KeepAspectRatio);
-    update_graphics();
 }
 
 void Dialog::addHomeField(int x, int y,QBrush brush){

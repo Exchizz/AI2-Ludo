@@ -4,10 +4,20 @@
 #include <vector>
 #include <random>
 #include <iostream>
-#include <QtGui>
+#include <QtCore>
+#include <QThread>
 
-class game {
+
+#include "positions_and_dice.h"
+
+class game : public QThread
+{
+    Q_OBJECT
 private:
+    bool game_complete;
+    bool turn_complete;
+    unsigned int game_delay;
+    positions_and_dice relative;
     int dice_result;
     std::vector<int> relativePosition();
     int isStar(int index);
@@ -16,6 +26,10 @@ private:
     int rel_to_fixed(int relative_piece_index);
     void send_them_home(int index);
     void move_start(int fixed_piece);
+    int next_turn();
+    static void msleep(unsigned long msecs){
+        QThread::msleep(msecs);
+    }
 public:
     int color;
     std::vector<int> player_positions;
@@ -26,9 +40,25 @@ public:
         dice_result = dis(gen);
     }
     int getDiceRoll() {return dice_result; }
-    int next_turn(std::vector<int> &relative_pos, int &dice);
     game();
-    void movePiece(int piece); //check game rules
+    void setGameDelay(unsigned int mili_seconds){ game_delay = mili_seconds; }
+signals:
+    void player1_start(positions_and_dice);
+    void player2_start(positions_and_dice);
+    void player3_start(positions_and_dice);
+    void player4_start(positions_and_dice);
+
+    void player1_end(std::vector<int>);
+    void player2_end(std::vector<int>);
+    void player3_end(std::vector<int>);
+    void player4_end(std::vector<int>);
+
+    void update_graphics(std::vector<int>);
+public slots:
+    void turnComplete(bool win);
+    void movePiece(int relative_piece); //check game rules
+protected:
+    void run();
 };
 
 #endif // GAME_H

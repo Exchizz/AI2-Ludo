@@ -11,7 +11,6 @@ game::game(){
 //    player_positions[4] = 13;
 //    player_positions[8] = 26;
     player_positions[12] = 39;
-    rollDice();
     color = 3;
 }
 
@@ -72,7 +71,7 @@ void game::move_start(int fixed_piece){
     }
 }
 
-int game::next_turn(){
+int game::next_turn(unsigned int delay = 0){
     switch(color){
         case 0:
         case 1:
@@ -90,7 +89,7 @@ int game::next_turn(){
     emit set_color(color);
     emit set_dice_result(dice_result);
 
-    msleep(game_delay - game_delay/4);
+    msleep(delay);
     switch(color){
         case 0:
             emit player1_start(relative);
@@ -249,7 +248,7 @@ void game::run() {
         if(turn_complete){
             turn_complete = false;
             msleep(game_delay/4);
-            next_turn();
+            next_turn(game_delay - game_delay/4);
         }
     }
 }

@@ -26,7 +26,7 @@ private:
     int rel_to_fixed(int relative_piece_index);
     void send_them_home(int index);
     void move_start(int fixed_piece);
-    int next_turn();
+    int next_turn(unsigned int delay);
     static void msleep(unsigned long msecs){
         QThread::msleep(msecs);
     }

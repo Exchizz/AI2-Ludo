@@ -26,8 +26,6 @@ Dialog::Dialog(QWidget *parent) :
     QPen blackPen(Qt::black);
     blackPen.setWidth(1);
 
-    QBrush globe_color(QColor(Qt::red));
-    QBrush star_color(QColor(Qt::yellow));
 
     // Cross
     scene->addRect(415,-155,160,960,blackPen,QBrush(QColor(195,195,194)));
@@ -89,23 +87,31 @@ Dialog::Dialog(QWidget *parent) :
         fieldPos.push_back(QPointF(x,300));
     for(int y=-110; y<=170; y+=offset)
         fieldPos.push_back(QPointF(470,y));
-    for(int x=600; x<=950; x+=offset)
+    for(int x=600; x<=880; x+=offset)
         fieldPos.push_back(QPointF(x,300));
-    for(int y=430; y<=780; y+=offset)
+    for(int y=430; y<=710; y+=offset)
         fieldPos.push_back(QPointF(470,y));
 
+    QImage globe_img("../globe.png");//http://www.clker.com/clipart-world-black-and-white.html
+    QImage star_img("../star.png");  //http://www.clker.com/clipart-2568.html
+//    QGraphicsPixmapItem globe( QPixmap::fromImage(QImage("../globe.png")));
+//    QGraphicsPixmapItem star( QPixmap::fromImage(QImage("../star.png")));
     for(size_t c = 0; c < base_colors.size(); ++c){
         scene->addEllipse(fieldPos[0+13*c].x(),fieldPos[0+13*c].y(),50,50,QPen(base_colors[c].first),QBrush(base_colors[c].second));
         for(int i=1; i < 13; ++i){
-//            std::cout << fieldPos[i+13*c].first << "," << fieldPos[i+13*c].second << std::endl;
-            if(i % 8 == 0)
-                scene->addEllipse(fieldPos[i+13*c].x(),fieldPos[i+13*c].y(),50,50,blackPen,globe_color);
-            else if(i == 5 )
-                scene->addEllipse(fieldPos[i+13*c].x(),fieldPos[i+13*c].y(),50,50,blackPen,star_color);
-            else if(i == 11)
-                scene->addEllipse(fieldPos[i+13*c].x(),fieldPos[i+13*c].y(),50,50,blackPen,star_color);
-            else
+            if(i == 8){
+                QGraphicsPixmapItem * globe = new QGraphicsPixmapItem( QPixmap::fromImage(globe_img));
+                globe->setPos(fieldPos[i+13*c]);
+                globe->setScale(0.5);
+                scene->addItem(globe);
+            } else if(i == 5 || i == 11){
+                QGraphicsPixmapItem * star = new QGraphicsPixmapItem( QPixmap::fromImage(star_img));
+                star->setPos(fieldPos[i+13*c]);
+                star->setScale(0.5);
+                scene->addItem(star);
+            } else {
                 scene->addEllipse(fieldPos[i+13*c].x(),fieldPos[i+13*c].y(),50,50,blackPen,white);
+            }
         }
     }
     for(size_t g = 52; g < fieldPos.size(); ++g){

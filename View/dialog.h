@@ -10,6 +10,7 @@
 #include <QGraphicsScene>
 #include "game.h"
 #include <QGraphicsEllipseItem>
+#include <QPixmap>
 
 namespace Ui {
 class Dialog;

@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
     ludo_player p1, p2, p3, p4;
     game g;
-    g.setGameDelay(4000);
+    g.setGameDelay(5000);
 
     QObject::connect(&g,SIGNAL(update_graphics(std::vector<int>)),&w,SLOT(update_graphics(std::vector<int>)));
     QObject::connect(&g,SIGNAL(set_color(int)),&w,SLOT(get_color(int)));

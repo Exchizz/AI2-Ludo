@@ -1,21 +1,25 @@
 #include "game.h"
+#define DEBUG 0
 
 game::game(){
     game_delay = 1000;
     game_complete = false;
     turn_complete = true;
-    for(int i=0; i < 16; ++i){
-        player_positions.push_back(-1);
+    for(int i = 0; i < 16; ++i){
+         player_positions.push_back(-1);
     }
-//    player_positions[0] = 52;
-//    player_positions[1] = 99;
-//    player_positions[2] = 99;
-//    player_positions[3] = 99;
-//    player_positions[4] = 13;
-//    player_positions[8] = 26;
-//    player_positions[12] = 39;
     color = 3;
 }
+
+void game::reset(){
+    game_complete = false;
+    turn_complete = true;
+    for(auto i : player_positions){
+        i = -1;
+    }
+    color = 3;
+}
+
 
 int game::rel_to_fixed(int relative_piece_index){
     return relative_piece_index + color * 4;
@@ -69,12 +73,13 @@ void game::move_start(int fixed_piece){
     if(dice_result == 6 && player_positions[fixed_piece] < 0){
         player_positions[fixed_piece] = color*13; //move me to start
         send_them_home(color*13); //send pieces home if they are on our start
-    } else {
-        std::cerr << "Invalid move!" << std::endl;
     }
 }
 
 int game::next_turn(unsigned int delay = 0){
+    if(game_complete){
+        return 0;
+    }
     switch(color){
         case 0:
         case 1:
@@ -122,15 +127,16 @@ void game::movePiece(int relative_piece){
         move_start(fixed_piece);
     } else {
         //convert to relative position
-        if(relative_pos == 99 || relative_pos == 56){
+        if(relative_pos == 99){
             std::cout << "I tought this would be it ";
         } else if(relative_pos < modifier) {
             relative_pos = relative_pos + 52 - modifier;
-        } else if( (relative_pos - modifier) > 50) {
+        } else if( relative_pos > 50) {
             relative_pos = relative_pos - color * 5 - 1;
         } else {//if(relative >= modifier)
             relative_pos = relative_pos - modifier;
         }
+        if(DEBUG) std::cout << "color: " << color << " pos: " << relative_pos << " + " << dice_result << " = " << relative_pos + dice_result;
         //add dice roll
         relative_pos += dice_result;
 
@@ -144,7 +150,7 @@ void game::movePiece(int relative_piece){
         }
         //special case checks
         if(relative_pos > 56 && relative_pos < 72){ // go back
-            target_pos = 56-(relative_pos-56) + color * 5; //trust me
+            target_pos = 56-(relative_pos-56) + color * 5 + 1; //trust me
         }else if(relative_pos == 56 || relative_pos >= 99){
             target_pos = 99;
         }else if(relative_pos > 50){ // goal stretch
@@ -166,8 +172,7 @@ void game::movePiece(int relative_piece){
                 send_them_home(target_pos);
             }
         }
-
-
+        if(DEBUG) std::cout << " => " << target_pos << std::endl;
         player_positions[fixed_piece] = target_pos;
     }
     std::vector<int> new_relative = relativePosition();
@@ -201,12 +206,14 @@ std::vector<int> game::relativePosition(){
     for(int i = 0; i < color*4; ++i){
         relative_positons.push_back(player_positions[i]);
     }
+
+
     for(size_t i = 0; i < relative_positons.size(); ++i){
         if(relative_positons[i] == 99 || relative_positons[i] == -1){
             relative_positons[i] = (relative_positons[i]);
         } else if(relative_positons[i] < modifier) {
             relative_positons[i] = (relative_positons[i]+52-modifier);
-        } else if(relative_positons[i] + modifier > 50) {
+        } else if(relative_positons[i] > 50) {
             relative_positons[i] = (relative_positons[i]-color*5-1);
         } else if(relative_positons[i] > modifier) {
             relative_positons[i] = (relative_positons[i]-modifier);
@@ -217,13 +224,15 @@ std::vector<int> game::relativePosition(){
 
 void game::turnComplete(bool win){
     game_complete = win;
-    turn_complete = !win;
+    turn_complete = true;
     if(game_complete){
+        std::cout << "player: " << color << " won" << std::endl;
         emit declare_winner(color);
     }
 }
 
 void game::run() {
+    if(DEBUG) std::cout << "color:     relative pos => fixed\n";
     while(!game_complete){
         if(turn_complete){
             turn_complete = false;
@@ -231,4 +240,5 @@ void game::run() {
             next_turn(game_delay - game_delay/4);
         }
     }
+    QThread::exit();
 }

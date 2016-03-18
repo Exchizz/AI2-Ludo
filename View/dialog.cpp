@@ -87,9 +87,9 @@ Dialog::Dialog(QWidget *parent) :
         fieldPos.push_back(QPointF(x,300));
     for(int y=-110; y<=170; y+=offset)
         fieldPos.push_back(QPointF(470,y));
-    for(int x=600; x<=880; x+=offset)
+    for(int x=880; x>=600; x-=offset)
         fieldPos.push_back(QPointF(x,300));
-    for(int y=430; y<=710; y+=offset)
+    for(int y=710; y>=430; y-=offset)
         fieldPos.push_back(QPointF(470,y));
 
     QImage globe_img("../globe.png");//http://www.clker.com/clipart-world-black-and-white.html

@@ -44,6 +44,7 @@ public:
     int getDiceRoll() {return dice_result; }
     game();
     void setGameDelay(unsigned int mili_seconds){ game_delay = mili_seconds; }
+    void reset();
 signals:
     void player1_start(positions_and_dice);
     void player2_start(positions_and_dice);

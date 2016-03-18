@@ -1,4 +1,5 @@
 #include "ludo_player.h"
+#include <random>
 
 ludo_player::ludo_player(){   
 }
@@ -21,9 +22,8 @@ int ludo_player::make_decision(){
                 return i;
             }
         }
-        for(int i = 0; i < 4; ++i){ //in case they are all locked in.
+        for(int i = 0; i < 4; ++i){ //maybe they are all locked in
             if(pos_start_of_turn[i]<0){
-                std::cout << "all is locked in" << std::endl;
                 return i;
             }
         }

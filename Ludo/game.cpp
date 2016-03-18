@@ -14,8 +14,8 @@ game::game(){
 void game::reset(){
     game_complete = false;
     turn_complete = true;
-    for(auto i : player_positions){
-        i = -1;
+     for(int i = 0; i < 16; ++i){
+        player_positions[i] = -1;
     }
     color = 3;
 }
@@ -40,7 +40,7 @@ int game::isStar(int index){
     return 0;
 }
 
-int game::isOccupied(int index){ //returns number of people
+int game::is_occupied(int index){ //returns number of people
     int number_of_people = 0;
     if(index != 99){
         for(auto i : player_positions){
@@ -52,8 +52,8 @@ int game::isOccupied(int index){ //returns number of people
     return number_of_people;
 }
 
-bool game::isGlobe(int index){
-    if(index % 13 == 0 || (index - 8) % 13 == 0 || isOccupied(index) > 1){
+bool game::is_globe(int index){
+    if(index % 13 == 0 || (index - 8) % 13 == 0 || is_occupied(index) > 1){
         return true;
     }
     return false;
@@ -91,9 +91,8 @@ int game::next_turn(unsigned int delay = 0){
             color = 0;
             break;
     }
-    global_color = color;
-    rollDice();
-    relative.dice = getDiceRoll();
+    roll_dice();
+    relative.dice = get_dice_roll();
     relative.pos = relativePosition();
     emit set_color(color);
     emit set_dice_result(dice_result);
@@ -165,8 +164,8 @@ void game::movePiece(int relative_piece){
         }
         //check for game stuff
 
-        if(isOccupied(target_pos)){
-            if(isGlobe(target_pos)){
+        if(is_occupied(target_pos)){
+            if(is_globe(target_pos)){
                 target_pos = -1; //send me home
             } else {
                 send_them_home(target_pos);
@@ -199,11 +198,11 @@ std::vector<int> game::relativePosition(){
     int modifier = color * 13;
 
     //from start id to end
-    for(int i = color*4; i < player_positions.size(); ++i){
+    for(size_t i = color*4; i < player_positions.size(); ++i){
         relative_positons.push_back(player_positions[i]);
     }
     //from 0 to start id
-    for(int i = 0; i < color*4; ++i){
+    for(size_t i = 0; i < color*4; ++i){
         relative_positons.push_back(player_positions[i]);
     }
 

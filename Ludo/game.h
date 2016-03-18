@@ -10,8 +10,6 @@
 
 #include "positions_and_dice.h"
 
-static int global_color = 5;
-
 class game : public QThread
 {
     Q_OBJECT
@@ -23,8 +21,8 @@ private:
     int dice_result;
     std::vector<int> relativePosition();
     int isStar(int index);
-    bool isGlobe(int index);
-    int isOccupied(int index); //see if it is occupied and return the piece number
+    bool is_globe(int index);
+    int is_occupied(int index); //see if it is occupied and return the piece number
     int rel_to_fixed(int relative_piece_index);
     void send_them_home(int index);
     void move_start(int fixed_piece);
@@ -35,16 +33,16 @@ private:
 public:
     int color;
     std::vector<int> player_positions;
-    void rollDice(){
+    void roll_dice(){
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dis(1, 6);
         dice_result = dis(gen);
     }
-    int getDiceRoll() {return dice_result; }
+    int get_dice_roll() {return dice_result; }
     game();
     void setGameDelay(unsigned int mili_seconds){ game_delay = mili_seconds; }
-    void reset();
+    void reset(); //not yet implemented
 signals:
     void player1_start(positions_and_dice);
     void player2_start(positions_and_dice);

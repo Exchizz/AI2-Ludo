@@ -240,5 +240,6 @@ void game::run() {
             next_turn(game_delay - game_delay/4);
         }
     }
+    emit close();
     QThread::exit();
 }

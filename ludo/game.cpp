@@ -40,12 +40,15 @@ int game::isStar(int index){
     return 0;
 }
 
-int game::isOccupied(int index){ //returns number of people
+int game::isOccupied(int index){ //returns number of people of another color
     int number_of_people = 0;
+
     if(index != 99){
-        for(auto i : player_positions){
-            if(i == index){
-                ++number_of_people;
+        for(size_t i = 0; i < player_positions.size(); ++i){
+            if(i < color*4 || i >= color*4 + 4){        //Disregard own players
+                if(player_positions[i] == index){
+                    ++number_of_people;
+                }
             }
         }
     }
@@ -53,15 +56,17 @@ int game::isOccupied(int index){ //returns number of people
 }
 
 bool game::isGlobe(int index){
-    if(index % 13 == 0 || (index - 8) % 13 == 0 || isOccupied(index) > 1){
-        return true;
+    if(index < 52){     //check only the indexes on the board, not in the home streak
+        if(index % 13 == 0 || (index - 8) % 13 == 0 || isOccupied(index) > 1){  //if more people of the same team stand on the same spot it counts as globe
+            return true;
+        }
     }
     return false;
 }
 
 void game::send_them_home(int index){
     for(size_t i = 0; i < player_positions.size(); ++i){
-        if(i < color*4 || i > color*4 + 4){ //different color
+        if(i < color*4 || i >= color*4 + 4){        //this way we don't skip one player position
             if(player_positions[i] == index){
                 player_positions[i] = -1;
             }
@@ -119,11 +124,11 @@ int game::next_turn(unsigned int delay = 0){
 }
 
 void game::movePiece(int relative_piece){
-    int fixed_piece = rel_to_fixed(relative_piece);
+    int fixed_piece = rel_to_fixed(relative_piece);     //index of the piece in player_positions
     int modifier = color * 13;
     int relative_pos = player_positions[fixed_piece];
     int target_pos = 0;
-    if(player_positions[fixed_piece] == -1){
+    if(player_positions[fixed_piece] == -1){        //if the selected piece is in the safe house, try to move it to start
         move_start(fixed_piece);
     } else {
         //convert to relative position
@@ -138,7 +143,7 @@ void game::movePiece(int relative_piece){
         }
         if(DEBUG) std::cout << "color: " << color << " pos: " << relative_pos << " + " << dice_result << " = " << relative_pos + dice_result;
         //add dice roll
-        relative_pos += dice_result;
+        relative_pos += dice_result;    //this is relative position of the selected token + the dice number
 
         int jump = isStar(relative_pos); //return 0 | 6 | 7
         if(jump){
@@ -150,7 +155,7 @@ void game::movePiece(int relative_piece){
         }
         //special case checks
         if(relative_pos > 56 && relative_pos < 72){ // go back
-            target_pos = 56-(relative_pos-56) + color * 5 + 1; //trust me
+            target_pos = 56-(relative_pos-56) + color * 5 + 1; //If the player moves over the goal, it should move backwards
         }else if(relative_pos == 56 || relative_pos >= 99){
             target_pos = 99;
         }else if(relative_pos > 50){ // goal stretch
@@ -160,7 +165,7 @@ void game::movePiece(int relative_piece){
             if(new_pos < 52){
                 target_pos = new_pos;
             } else { //wrap around
-                target_pos = new_pos - 52;
+                target_pos = new_pos - 52;  //this is the global position wrap around at the green entry point
             }
         }
         //check for game stuff

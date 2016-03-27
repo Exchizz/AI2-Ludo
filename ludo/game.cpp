@@ -14,7 +14,7 @@ game::game(){
 void game::reset(){
     game_complete = false;
     turn_complete = true;
-    for(auto i : player_positions){
+    for(auto &i : player_positions){ //without & we're changing the copy made in auto rather than the player_position
         i = -1;
     }
     color = 3;

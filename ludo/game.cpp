@@ -96,7 +96,7 @@ int game::next_turn(unsigned int delay = 0){
             color = 0;
             break;
     }
-    global_color = color;
+    // global_color = color;
     rollDice();
     relative.dice = getDiceRoll();
     relative.pos = relativePosition();

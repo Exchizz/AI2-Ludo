@@ -200,7 +200,8 @@ void Dialog::resizeEvent(QResizeEvent *){
     ui->graphicsView->fitInView(scene->itemsBoundingRect(),Qt::KeepAspectRatio);
 }
 
-void Dialog::get_winner(int color){
+void Dialog::get_winner() {
+// void Dialog::get_winner(int color){
     scene->addRect(0,500,1000,200,QPen(Qt::black,3,Qt::SolidLine,Qt::RoundCap, Qt::RoundJoin),QBrush(active_color));
     QGraphicsSimpleTextItem * win = scene->addSimpleText(QString("Winner is found!"),QFont("Courier", 72, QFont::Bold, true));
     win->setPos(50,550);

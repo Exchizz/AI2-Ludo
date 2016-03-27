@@ -45,7 +45,7 @@ int game::isOccupied(int index){ //returns number of people of another color
 
     if(index != 99){
         for(size_t i = 0; i < player_positions.size(); ++i){
-            if(i < color*4 || i >= color*4 + 4){        //Disregard own players
+            if(i < static_cast<size_t>(color)*4 || i >= static_cast<size_t>(color)*4 + 4){        //Disregard own players
                 if(player_positions[i] == index){
                     ++number_of_people;
                 }
@@ -66,7 +66,7 @@ bool game::isGlobe(int index){
 
 void game::send_them_home(int index){
     for(size_t i = 0; i < player_positions.size(); ++i){
-        if(i < color*4 || i >= color*4 + 4){        //this way we don't skip one player position
+        if(i < static_cast<size_t>(color)*4 || i >= static_cast<size_t>(color)*4 + 4){        //this way we don't skip one player position
             if(player_positions[i] == index){
                 player_positions[i] = -1;
             }
@@ -204,7 +204,7 @@ std::vector<int> game::relativePosition(){
     int modifier = color * 13;
 
     //from start id to end
-    for(int i = color*4; i < player_positions.size(); ++i){
+    for(int i = color*4; i < static_cast<int>(player_positions.size()); ++i){
         relative_positons.push_back(player_positions[i]);
     }
     //from 0 to start id

@@ -10,7 +10,7 @@
 
 #include "positions_and_dice.h"
 
-static int global_color = 5;
+// static int global_color = 5;
 
 class game : public QThread
 {

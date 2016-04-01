@@ -37,7 +37,7 @@
     slots,
     Q_OBJECT
     },
-    emphstyle={ \color{blue} }   
+    emphstyle={ \color{blue} }
 }
 
 %opening
@@ -49,7 +49,7 @@
 \maketitle
 
 \section{Getting the Game}
-The game can be found on
+The game can be found at
 \begin{verbatim}
 https://gitlab.com/niive12/ludo-gui
 \end{verbatim}
@@ -64,22 +64,22 @@ cd ludo-gui/build
 qmake ../ludo
 make
 \end{verbatim}
-And then the binary should be called ludo.
+And then the binary should be called \verb|ludo|.
 
 \section{The Game Structure}
 The ludo game is structured after a turn in the game.
 
 Each turn is a series of communications between the game class and the player class.
-In figure \ref{fig:communications} is the turn illustrated.
+In figure~\ref{fig:communications} the turn is illustrated.
 The game class updates the GUI.
-To make it easy to follow the game, two delays is inserted.
-The speed of the game is currently set in with the setGameDelay( msecs ) function in the main loop.
+To make it easy to follow the game, two delays are inserted.
+The speed of the game is currently set with the \verb|setGameDelay( msecs )| function in the main loop.
 One is inserted just when the turn is given to a player and a longer one is given after the dice has been rolled.
-The die is printed in the GUI on a colored square, representing which turn it is to move.
-In figure \ref{fig:screenshot} can the GUI be seen.
+The dice is printed in the GUI on a colored square, representing which player's turn it is to move.
+In figure~\ref{fig:screenshot} the GUI can be seen.
 The format of the positions is a \verb+std::vector<int>+.
-In the beginning of the turn, both the positions and the dice roll is given to the player.
-The two inputs is combined in a struct called positions\_and\_dice which has the members pos and dice.
+In the beginning of the turn, both the positions and the dice roll are given to the player.
+The two inputs are combined in a struct called \verb|positions_and_dice| which has the members \verb|pos| and \verb|dice|.
 
 \begin{figure}
 \centering
@@ -93,7 +93,7 @@ The two inputs is combined in a struct called positions\_and\_dice which has the
  \draw[->,ultra thick] (StartT) -| (MV)      node[midway,above]    {select\_piece()};
  \draw[->,ultra thick] (MV)     -| (PGA)     node[midway,above]    {playerX\_end()};
  \draw[->,ultra thick] (PGA)    -| (TC)      node[midway,above]    {turn\_complete()};
- 
+
  \node[above of=NextT,yshift=-3.5cm,name=title] {Game} node[right of=title, xshift=-1.5cm] {Player};
 \end{tikzpicture}
 \caption{A turn in the game.}\label{fig:communications}
@@ -103,7 +103,7 @@ There is a lot of different rules to the game.
 There is no special house rules added to the game.
 The player has one chance to roll a 6 to get out.
 A player only sends competitor home if they share the same end position.
-This means if a piece is standing on every star, the first one will not be touched, but the second piece will be sent home. 
+This means if a piece is standing on every star, the first one will not be touched, but the second piece will be sent home.
 Two pieces of the same team counts as a globe and will send the piece that moves to it home.
 
 \begin{figure}
@@ -115,24 +115,24 @@ Two pieces of the same team counts as a globe and will send the piece that moves
 \section{Implementing a Player}
 Two examples of a player is given in project.
 They should be implemented as a class which has the signals described in the previous section.
-For reference, it is also shown in \lstlistingname \ref{ludo_player}.
-The private values and variables is up to the programmer, but they are included for completeness.
+For reference, it is also shown in \lstlistingname~\ref{ludo_player}.
+The private values and variables are up to the programmer, but they are included for completeness.
 
-The positions are always sorted, so that index 0-3 is the players own pieces, 4-7 is the pieces of the next player clockwise on the board etc.
+The positions are always sorted, so that index 0-3 is the player's own pieces, 4-7 is the pieces of the next player clockwise on the board etc.
 The positions are also moved, such that they are relative to the starting point of the player.
-There is two ``off board'' positions a piece can be in.
+There are two ``off board'' positions a piece can be in.
 It can be in the home position which is called -1, and it can be in goal position, called 99.
 This allows for easy calculations of moving past field 57, so it moves backwards in the game.
 Field 0 is the first globe outside the start position, colored like the home field.
 Field 51 is the first step in the goal stretch.
 
 An important note is that the player should check if it has won.
-The turn\_complete sends a bool to the game, that, if true will declare them the winner and stop the game, and should be false if they have not won the game.
-The select\_piece sends the index of the piece to the game.
+The \verb|turn_complete()| sends a bool to the game that, if true, will declare them the winner and stop the game, and should be false if they have not won the game.
+The \verb|select_piece()| sends the index of the piece to the game.
 
 \lstinputlisting[language=c++,
 	firstnumber=7,
-        firstline=7, 
+        firstline=7,
         lastline=22,
         caption={Class skeleton as found in Ludo/ludo\_player.h},
         label={ludo_player}

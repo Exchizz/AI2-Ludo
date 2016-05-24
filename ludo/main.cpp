@@ -25,6 +25,7 @@ int main(int argc, char *argv[]){
     QObject::connect(&g,SIGNAL(set_color(int)),                   &w,SLOT(get_color(int)));
     QObject::connect(&g,SIGNAL(set_dice_result(int)),             &w,SLOT(get_dice_result(int)));
     QObject::connect(&g,SIGNAL(declare_winner(int)),              &w,SLOT(get_winner()));
+    QObject::connect(&g,SIGNAL(close()),&a,SLOT(quit()));
     w.show();
     /*/ //Or don't add the GUI
     QObject::connect(&g,SIGNAL(close()),&a,SLOT(quit()));
@@ -51,8 +52,10 @@ int main(int argc, char *argv[]){
     QObject::connect(&g, SIGNAL(player4_end(std::vector<int>)),    &p4,SLOT(post_game_analysis(std::vector<int>)));
     QObject::connect(&p4,SIGNAL(turn_complete(bool)),              &g, SLOT(turnComplete(bool)));
 
-    g.start();
-
-
-    return a.exec();
+    for(int i = 0; i < 10; ++i){
+        g.start();
+        a.exec();
+        g.reset();
+    }
+    return 0;
 }

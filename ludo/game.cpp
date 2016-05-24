@@ -1,14 +1,17 @@
 #include "game.h"
 #define DEBUG 0
 
-game::game(){
-    game_delay = 1000;
-    game_complete = false;
-    turn_complete = true;
-    for(int i = 0; i < 16; ++i){
-         player_positions.push_back(-1);
-    }
-    color = 3;
+game::game():
+    game_complete(false),
+    turn_complete(true),
+    game_delay(1000),
+    relative(),
+    dice_result(1),
+    rd(),
+    gen(rd()),
+    color(3),
+    player_positions({-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1})
+{
 }
 
 void game::reset(){

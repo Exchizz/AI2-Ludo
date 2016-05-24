@@ -21,6 +21,8 @@ private:
     unsigned int game_delay;
     positions_and_dice relative;
     int dice_result;
+    std::random_device rd;
+    std::mt19937 gen;
     std::vector<int> relativePosition();
     int isStar(int index);
     bool isGlobe(int index);
@@ -36,8 +38,6 @@ public:
     int color;
     std::vector<int> player_positions;
     void rollDice(){
-        std::random_device rd;
-        std::mt19937 gen(rd());
         std::uniform_int_distribution<> dis(1, 6);
         dice_result = dis(gen);
     }

@@ -26,7 +26,7 @@ public:
 private:
     QColor active_color;
     int current_dice_roll;
-    void addHomeField(int,int,QBrush);
+    void addHomeField(int dx, int dy, QBrush);
     void showEvent(QShowEvent *);
     void resizeEvent(QResizeEvent *);
     Ui::Dialog *ui;

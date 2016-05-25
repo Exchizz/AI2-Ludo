@@ -140,9 +140,9 @@ void game::movePiece(int relative_piece){
         } else if(relative_pos == 51){ //if people land on 51, they shouldn't be sent to goal stretch
             switch(color){
             case 0 : relative_pos = 51; break;
-            case 0 : relative_pos = 38; break;
-            case 0 : relative_pos = 25; break;
-            case 0 : relative_pos = 12; break;
+            case 1 : relative_pos = 38; break;
+            case 2 : relative_pos = 25; break;
+            case 3 : relative_pos = 12; break;
             }
         } else if( relative_pos > 50) {
             relative_pos = relative_pos - color * 5 - 1;

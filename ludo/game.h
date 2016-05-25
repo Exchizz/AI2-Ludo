@@ -32,7 +32,9 @@ private:
     void move_start(int fixed_piece);
     int next_turn(unsigned int delay);
     static void msleep(unsigned long msecs){
-        QThread::msleep(msecs);
+        if(msecs > 0){
+            QThread::msleep(msecs);
+        }
     }
 public:
     int color;

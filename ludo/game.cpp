@@ -137,9 +137,13 @@ void game::movePiece(int relative_piece){
         //convert to relative position
         if(relative_pos == 99){
             std::cout << "I tought this would be it ";
-        } else if(relative_pos == 51 && color != 0){
-             int tmp_abs =  relative_pos - 52;
-             relative_pos = (tmp_abs - modifier); //Alien attack prevention
+        } else if(relative_pos == 51){ //if people land on 51, they shouldn't be sent to goal stretch
+            switch(color){
+            case 0 : relative_pos = 51; break;
+            case 0 : relative_pos = 38; break;
+            case 0 : relative_pos = 25; break;
+            case 0 : relative_pos = 12; break;
+            }
         } else if( relative_pos > 50) {
             relative_pos = relative_pos - color * 5 - 1;
         } else if(relative_pos < modifier) {
@@ -169,7 +173,7 @@ void game::movePiece(int relative_piece){
         }else if(relative_pos > 50){ // goal stretch
             target_pos = relative_pos + color * 5 + 1;
         } else {
-            int new_pos = relative_pos + color * 13;
+            int new_pos = relative_pos + modifier;
             if(new_pos < 52){
                 target_pos = new_pos;
             } else { //wrap around

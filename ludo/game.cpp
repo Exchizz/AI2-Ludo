@@ -137,6 +137,11 @@ void game::movePiece(int relative_piece){
         //convert to relative position
         if(relative_pos == 99){
             std::cout << "I tought this would be it ";
+        } else if(relative_pos == 51 && color != 0){
+             int tmp_abs =  relative_pos - 52;
+             relative_pos = (tmp_abs - modifier); //Alien attack prevention
+        } else if( relative_pos > 50) {
+            relative_pos = relative_pos - color * 5 - 1;
         } else if(relative_pos < modifier) {
             relative_pos = relative_pos + 52 - modifier;
         } else if( relative_pos > 50) {

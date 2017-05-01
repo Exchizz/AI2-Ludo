@@ -20,11 +20,11 @@ int main(int argc, char *argv[]){
     qRegisterMetaType<positions_and_dice>();
 
     //instanciate the players here
-    ludo_player p1, p2; // Green, yellow
-    ludo_player_random p3, p4;
+    ludo_player p1; // Green, yellow
+    ludo_player_random p2,p3, p4;
 
     game g;
-    g.setGameDelay(10); //if you want to see the game, set a delay
+    g.setGameDelay(1000); //if you want to see the game, set a delay
 
     //set up for each player
     QObject::connect(&g, SIGNAL(player1_start(positions_and_dice)),&p1,SLOT(start_turn(positions_and_dice)));

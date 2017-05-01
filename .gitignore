@@ -32,3 +32,5 @@ build/
 
 # QT Generated Files
 *.user
+
+moc_*

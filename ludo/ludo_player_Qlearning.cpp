@@ -19,17 +19,15 @@ ludo_player_Qlearning::ludo_player_Qlearning(game *obj):
     dice_roll(0),
     rd(),
     gen(rd())
-{
+ {
     game_obj = obj;
 }
 
 int ludo_player_Qlearning::get_current_state(int token_state){
   int state = ST_FREESPACE;
 
-  #warning Needs occupied state(as globe)
-
   // If token is on globe
-  if((token_state - 8) % 13 == 0 ){
+  if( token_state > 0 && game_obj->isGlobe(token_state) ){
     state = ST_GLOBE;
   }
 

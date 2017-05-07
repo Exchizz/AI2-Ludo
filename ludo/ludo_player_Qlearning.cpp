@@ -1,6 +1,10 @@
 #include "ludo_player_Qlearning.h"
 
 
+
+#define NUMBER_OF_STATES    5
+#define NUMBER_OF_ACTIONS   5
+
 #define GAME_POSITION_HOME -1
 #define GAME_POSITION_GOAL 99
 
@@ -12,6 +16,18 @@
 #define ST_FREESPACE    5
 
 
+void QTabledumper(std::vector< std::vector<int> > &Qtable){
+  std::cout << "QTable --------------------------------" << std::endl;
+  for(unsigned int state = 0; state < Qtable.size(); state++){
+    for(unsigned int action = 0; action < Qtable[0].size(); action++){
+      std::cout << "Val: " << Qtable[state][action] << "\t";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << "QTable end ----------------------------" << std::endl;
+
+}
+
 
 ludo_player_Qlearning::ludo_player_Qlearning(game *obj):
     pos_start_of_turn(16),
@@ -21,12 +37,18 @@ ludo_player_Qlearning::ludo_player_Qlearning(game *obj):
     gen(rd())
  {
     game_obj = obj;
-}
+    std::vector< std::vector<int> > QTable(NUMBER_OF_ACTIONS, std::vector<int>(NUMBER_OF_STATES));
+
+    // State 2, action 3 = 200;
+    // QTable[2][3] = 200;
+    QTabledumper(QTable);
+  }
 
 int ludo_player_Qlearning::get_current_state(int token_state){
   int state = ST_FREESPACE;
 
-  // If token is on globe
+  // If token is out and is on globe
+  // Might divide this up later..
   if( token_state > 0 && game_obj->isGlobe(token_state) ){
     state = ST_GLOBE;
   }
@@ -38,7 +60,6 @@ int ludo_player_Qlearning::get_current_state(int token_state){
   if (token_state == GAME_POSITION_HOME){
     state = ST_HOME;
   }
-
 
   if(game_obj->isStar(token_state)){
     state = ST_STAR;

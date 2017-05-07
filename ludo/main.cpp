@@ -4,6 +4,7 @@
 #include <vector>
 #include "ludo_player.h"
 #include "ludo_player_random.h"
+#include "ludo_player_Qlearning.h"
 #include "positions_and_dice.h"
 
 Q_DECLARE_METATYPE( positions_and_dice )
@@ -12,14 +13,16 @@ int main(int argc, char *argv[]){
     QApplication a(argc, argv);
     qRegisterMetaType<positions_and_dice>();
 
-    //instanciate the players here
-    ludo_player p1, p2;
-    ludo_player_random p3, p4;
-
     game g;
-    g.setGameDelay(000); //if you want to see the game, set a delay
+    g.setGameDelay(1000); //if you want to see the game, set a delay
 
-    /* Add a GUI <-- remove the '/' to uncomment block
+    //instanciate the players here
+    ludo_player_Qlearning p1(&g);
+    ludo_player_random p2,p3, p4;
+
+
+
+    // * Add a GUI <-- remove the '/' to uncomment block
     Dialog w;
     QObject::connect(&g,SIGNAL(update_graphics(std::vector<int>)),&w,SLOT(update_graphics(std::vector<int>)));
     QObject::connect(&g,SIGNAL(set_color(int)),                   &w,SLOT(get_color(int)));
@@ -27,7 +30,7 @@ int main(int argc, char *argv[]){
     QObject::connect(&g,SIGNAL(declare_winner(int)),              &w,SLOT(get_winner()));
     QObject::connect(&g,SIGNAL(close()),&a,SLOT(quit()));
     w.show();
-    /*/ //Or don't add the GUI
+    //*/ //Or don't add the GUI
     QObject::connect(&g,SIGNAL(close()),&a,SLOT(quit()));
     //*/
 

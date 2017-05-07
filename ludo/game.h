@@ -36,6 +36,7 @@ private:
             QThread::msleep(msecs);
         }
     }
+    friend class ludo_player_Qlearning;
 public:
     int color;
     std::vector<int> player_positions;

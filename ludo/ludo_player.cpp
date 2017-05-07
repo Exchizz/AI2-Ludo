@@ -11,6 +11,11 @@ ludo_player::ludo_player():
 int ludo_player::make_decision(){
     if(dice_roll == 6){
         for(int i = 0; i < 4; ++i){
+	        //  for(auto elm: pos_start_of_turn){
+		      //      std::cout << elm << " ";
+	        //     }
+		      //       std::cout << std::endl;
+
             if(pos_start_of_turn[i]<0){
                 return i;
             }

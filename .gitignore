@@ -1,5 +1,3 @@
-*~
-
 # Compiled Object files
 *.slo
 *.lo
@@ -34,3 +32,4 @@ build/
 
 # QT Generated Files
 *.user
+moc_*

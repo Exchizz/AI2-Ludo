@@ -2,8 +2,8 @@
 
 
 
-#define NUMBER_OF_STATES    5
-#define NUMBER_OF_ACTIONS   5
+#define NUMBER_OF_STATES    9
+#define NUMBER_OF_ACTIONS   11
 
 #define GAME_POSITION_HOME -1
 #define GAME_POSITION_GOAL 99
@@ -14,6 +14,21 @@
 #define ST_STAR         3
 #define ST_WINNER_ROAD  4
 #define ST_FREESPACE    5
+
+
+
+#define MOVE_OUT_FROM_HOME                          0
+#define MOVE_IN_GOAL                                 1
+#define MOVE_TO_GLOBE                               2
+#define MOVE_TO_STAR                                3
+#define MOVE_TO_GOAL_VIA_STAR                       4
+#define GET_INTO_SAFETY_WITH_AN_SAME_COLORED_TOKEN  5
+#define GET_INTO_THE_WINNER_ROAD                    6
+#define SUICIDE_IF_THE_OPPONENT_IS_ON_A_GLOBE       7
+#define KILL_OPPONENT                               8
+#define JUST_MOVE                                   9
+#define NO_MOVE_POSSIBLE                            10
+
 
 
 void QTabledumper(std::vector< std::vector<int> > &Qtable){
@@ -35,7 +50,7 @@ ludo_player_Qlearning::ludo_player_Qlearning(game *obj):
     dice_roll(0),
     rd(),
     gen(rd())
- {
+  {
     game_obj = obj;
     std::vector< std::vector<int> > QTable(NUMBER_OF_ACTIONS, std::vector<int>(NUMBER_OF_STATES));
 
@@ -71,6 +86,34 @@ int ludo_player_Qlearning::get_current_state(int token_state){
   return state;
 }
 
+std::vector<int> get_possible_actions(int token_pose, int dice_roll){
+  int new_state = token_pose + dice_roll;
+
+  std::vector<int> possible_actions;
+
+  if(new_state > 0){
+    possible_actions.push_back(MOVE_OUT_FROM_HOME);
+  }
+
+  if(new_state == GAME_POSITION_GOAL){
+    possible_actions.push_back(MOVE_IN_GOAL);
+  }
+
+  if(game_obj->isStar(new_state)){
+    possible_actions.push_back(MOVE_TO_STAR);
+  }
+
+  if(new_state > 50){ // If in goal-road
+    possible_actions.push_back(GET_INTO_THE_WINNER_ROAD);
+  }
+
+  if(game_obj->isGlobe(new_state) ){ // If on goal
+    state = ST_GLOBE;
+  }
+
+  //missing action with safe zone.
+  possible_actions.push_back(JUST_MOVE);
+}
 std::string state_int_to_string(int token_state){
   std::string state_str;
   switch(token_state){
@@ -109,7 +152,7 @@ int ludo_player_Qlearning::make_decision(){
     int current_state = get_current_state(pos_start_of_turn[i]);
     std::cout << "Player #" << i << " state: " << state_int_to_string(current_state) << "\t";
     // Calculate possible actions based on state and dice_roll
-    //auto possible_actions = get_possible_actions(current_state, dice_roll);
+    auto possible_actions = get_possible_actions(token_state, dice_roll);
   }
   std::cout << std::endl;
 

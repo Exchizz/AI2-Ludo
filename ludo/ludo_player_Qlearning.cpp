@@ -1,11 +1,18 @@
 #include "ludo_player_Qlearning.h"
 
-#define NUMBER_OF_STATES    9
+#define NUMBER_OF_STATES    6
 #define NUMBER_OF_ACTIONS   11
 
 #define GAME_POSITION_HOME -1
 #define GAME_POSITION_GOAL 56
 
+#define STATE(var)  std::get<0>(var)
+#define ACTION(var)  std::get<1>(var)
+#define TOKEN(var)  std::get<2>(var)
+#define POSITION(var)  std::get<3>(var)
+
+
+// States
 #define ST_HOME         0
 #define ST_GOAL         1
 #define ST_GLOBE        2
@@ -13,11 +20,7 @@
 #define ST_WINNER_ROAD  4
 #define ST_FREESPACE    5
 
-#define STATE(var)  std::get<0>(var)
-#define ACTION(var)  std::get<1>(var)
-#define TOKEN(var)  std::get<2>(var)
-
-
+// Actions
 #define MOVE_OUT_FROM_HOME                          0
 #define MOVE_IN_GOAL                                1
 #define MOVE_TO_GLOBE                               2
@@ -32,20 +35,29 @@
 
 
 bool is_star(int pos){
-  std::vector<int> v{ 5, 11, 18, 24, 31, 37, 44 }; // Globes, start pose(when 6) not included
+  std::vector<int> v{ 5, 11, 18, 24, 31, 37, 44, 50}; // Globes, start pose(when 6) not included
   return (std::find(v.begin(), v.end(), pos) != v.end());
 }
-
 bool is_globe(int pos){
   std::vector<int> v{ 8, 21, 34, 47 }; // Globes, start pose(when 6) not included
   return (std::find(v.begin(), v.end(), pos) != v.end());
 }
 
 void QTabledumper(std::vector< std::vector<int> > &Qtable){
-  std::cout << "QTable --------------------------------" << std::endl;
+  std::cout << "QTable -----------Action---------------------" << std::endl;
+  for(unsigned int i = 0; i < NUMBER_OF_ACTIONS ;i++){
+    std::cout<< " " << i << "\t";
+  }
+  std::cout << std::endl;
+
+  for(unsigned int i = 0; i < NUMBER_OF_ACTIONS*7+11 ;i++){
+    std::cout<< "-";
+  }
+  std::cout << std::endl;
   for(unsigned int state = 0; state < Qtable.size(); state++){
+    std::cout << state << " |";
     for(unsigned int action = 0; action < Qtable[0].size(); action++){
-      std::cout << "Val: " << Qtable[state][action] << "\t";
+      std::cout << " " << Qtable[state][action] << "\t";
     }
     std::cout << std::endl;
   }
@@ -58,12 +70,17 @@ ludo_player_Qlearning::ludo_player_Qlearning(game *obj):
     dice_roll(0),
     rd(),
     gen(rd()),
-    QTable(NUMBER_OF_ACTIONS, std::vector<int>(NUMBER_OF_STATES))
+    QTable(NUMBER_OF_STATES, std::vector<int>(NUMBER_OF_ACTIONS))
   {
     game_obj = obj;
 
     // State 2, action 3 = 200;
     // QTable[2][3] = 200;
+    QTable[ST_WINNER_ROAD][MOVE_IN_GOAL] = 100;
+    QTable[ST_STAR][MOVE_IN_GOAL] = 100;
+    QTable[ST_FREESPACE][MOVE_IN_GOAL] = 100;
+
+
     QTabledumper(QTable);
   }
 int ludo_player_Qlearning::get_current_state(int token_state){
@@ -95,16 +112,18 @@ int ludo_player_Qlearning::get_current_state(int token_state){
 std::vector<int> ludo_player_Qlearning::get_possible_actions(int token_pose, int _dice_roll){
   int new_pose = token_pose + _dice_roll;
 
-  std::cout << "\t" << new_pose << " token_pose: " << token_pose <<  std::endl;
   std::vector<int> possible_actions;
+  if(token_pose >= 56 ){
+    return possible_actions;
+  }
 
   if(new_pose  == (-1 + 6)){ // in home = -1, 6 to move out
     possible_actions.push_back(MOVE_OUT_FROM_HOME);
     return possible_actions;
   }
 
-  if(new_pose == 56){ // 56 is actual goal
-    getchar();
+  if(new_pose == 56 || new_pose == 50){ // 56 is actual goal
+    //getchar();
     possible_actions.push_back(MOVE_IN_GOAL);
     return possible_actions;
   }
@@ -113,7 +132,7 @@ std::vector<int> ludo_player_Qlearning::get_possible_actions(int token_pose, int
     possible_actions.push_back(MOVE_TO_STAR);
   }
 
-  if(new_pose > 50){ // If in goal-road
+  if(new_pose > 50 and token_pose <= 50){ // If can move in goal road but currently isn't in goal road.
     possible_actions.push_back(GET_INTO_THE_WINNER_ROAD);
   }
 
@@ -128,6 +147,7 @@ std::vector<int> ludo_player_Qlearning::get_possible_actions(int token_pose, int
   }
   return possible_actions;
 }
+
 std::string state_int_to_string(int token_state){
   std::string state_str;
   switch(token_state){
@@ -220,7 +240,7 @@ state_action ludo_player_Qlearning::maxQ(std::vector<state_action> &possible_mov
     int Tmpstate = STATE(action);
     int Tmpaction = ACTION(action);
 
-    if(QTable[Tmpstate][Tmpaction] > max){
+    if(QTable[Tmpstate][Tmpaction] >= max){
       max = QTable[Tmpstate][Tmpaction];
       max_state_action = action;
     }
@@ -236,14 +256,14 @@ int ludo_player_Qlearning::make_decision(){
   for(int token_i = 0; token_i < 4; token_i++){
     // Get current state
     int current_state = get_current_state(pos_start_of_turn[token_i]);
-    std::cout << "Token #" << token_i << " state: " << state_int_to_string(current_state) << std::endl;
+
+    //std::cout << "Token #" << token_i << " state: " << state_int_to_string(current_state) << std::endl;
     // Calculate possible actions based on state and dice_roll
     auto possible_actions = get_possible_actions(pos_start_of_turn[token_i], dice_roll);
 
-    std::cout << "Number of possible actions: " << possible_actions.size() << std::endl;
-
+    // std::cout << "Number of possible actions: " << possible_actions.size() << std::endl;
     for(auto possible_action : possible_actions){
-      possiblePlayerMoves.push_back(std::make_tuple(current_state, possible_action, token_i));
+      possiblePlayerMoves.push_back(std::make_tuple(current_state, possible_action, token_i,pos_start_of_turn[token_i]));
     }
   }
 
@@ -256,7 +276,21 @@ int ludo_player_Qlearning::make_decision(){
   auto best_move = maxQ(possiblePlayerMoves);
   std::cout << "Token " << TOKEN(best_move) << " should be moved" << std::endl;
   std::cout << std::endl;
+  int immidiate_reward = POSITION(last_move);
+  float a = 0.5;
+  float lambda = 0.2;
+  /*
+  #define STATE(var)  std::get<0>(var)
+  #define ACTION(var)  std::get<1>(var)
+  #define TOKEN(var)  std::get<2>(var)
+  */
+  std::cout << "\t" << " Last state: " << state_int_to_string(STATE(last_move)) << " Last action: " << action_int_to_string(ACTION(last_move)) << std::endl;
+  std::cout << "\t" << " Best state: " << state_int_to_string(STATE(best_move)) << " Best action: " << action_int_to_string(ACTION(best_move)) << std::endl;
 
+  QTable[STATE(last_move)][ACTION(last_move)] = QTable[STATE(last_move)][ACTION(last_move)] + a*(immidiate_reward + lambda*QTable[STATE(best_move)][ACTION(best_move)] - QTable[STATE(last_move)][ACTION(last_move)]);
+  last_move = best_move;
+
+  QTabledumper(QTable);
   //
   // if(e_greedy() == EXPLOIT){
   //   // From actions possible, select the best one

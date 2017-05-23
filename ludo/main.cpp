@@ -14,7 +14,7 @@ int main(int argc, char *argv[]){
     qRegisterMetaType<positions_and_dice>();
 
     game g;
-    g.setGameDelay(1000); //if you want to see the game, set a delay
+    g.setGameDelay(0); //if you want to see the game, set a delay
 
     //instanciate the players here
     ludo_player_Qlearning p1(&g);
@@ -23,14 +23,13 @@ int main(int argc, char *argv[]){
 
 
     // * Add a GUI <-- remove the '/' to uncomment block
-    Dialog w;
-    QObject::connect(&g,SIGNAL(update_graphics(std::vector<int>)),&w,SLOT(update_graphics(std::vector<int>)));
-    QObject::connect(&g,SIGNAL(set_color(int)),                   &w,SLOT(get_color(int)));
-    QObject::connect(&g,SIGNAL(set_dice_result(int)),             &w,SLOT(get_dice_result(int)));
-    QObject::connect(&g,SIGNAL(declare_winner(int)),              &w,SLOT(get_winner()));
-    QObject::connect(&g,SIGNAL(close()),&a,SLOT(quit()));
-    w.show();
-    //*/ //Or don't add the GUI
+    // Dialog w;
+    // QObject::connect(&g,SIGNAL(update_graphics(std::vector<int>)),&w,SLOT(update_graphics(std::vector<int>)));
+    // QObject::connect(&g,SIGNAL(set_color(int)),                   &w,SLOT(get_color(int)));
+    // QObject::connect(&g,SIGNAL(set_dice_result(int)),             &w,SLOT(get_dice_result(int)));
+    // QObject::connect(&g,SIGNAL(declare_winner(int)),              &w,SLOT(get_winner()));
+    // QObject::connect(&g,SIGNAL(close()),&a,SLOT(quit()));
+    // w.show();
     QObject::connect(&g,SIGNAL(close()),&a,SLOT(quit()));
     //*/
 
@@ -55,10 +54,18 @@ int main(int argc, char *argv[]){
     QObject::connect(&g, SIGNAL(player4_end(std::vector<int>)),    &p4,SLOT(post_game_analysis(std::vector<int>)));
     QObject::connect(&p4,SIGNAL(turn_complete(bool)),              &g, SLOT(turnComplete(bool)));
 
-    for(int i = 0; i < 10000; ++i){
+    for(int i = 0; i < 1000; ++i){
         g.start();
         a.exec();
         g.reset();
     }
+    int player_0_wins = 0;
+    for(auto winner: g.winner_history){
+      if(winner == 0){
+          player_0_wins++;
+      }
+    }
+
+    std::cout << "Winrate: " << (player_0_wins/1000.0)*100;
     return 0;
 }

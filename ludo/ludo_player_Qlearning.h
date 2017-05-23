@@ -7,7 +7,7 @@
 #include <tuple>
 
 // State, Action, Token
-typedef std::tuple<int,int,int> state_action;
+typedef std::tuple<int,int,int,int> state_action;
 
 
 class ludo_player_Qlearning : public QObject {
@@ -20,6 +20,8 @@ private:
     std::mt19937 gen;
     game* game_obj;
     std::vector< std::vector<int> > QTable;
+
+    state_action last_move;
 
     int make_decision();
 public:

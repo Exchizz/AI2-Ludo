@@ -38,11 +38,22 @@ private:
     }
     friend class ludo_player_Qlearning;
 public:
+    std::vector<int> winner_history;
     int color;
     std::vector<int> player_positions;
     void rollDice(){
+        static int i = 0;
         std::uniform_int_distribution<> dis(1, 6);
         dice_result = dis(gen);
+        // std::cout << "i: " <<  i << std::endl;
+        // if(i%4 == 0){
+        //   std::vector<int> v{ 6,6,6,6,6,6,6,6,2,1,6,6,6,6,6,6,6,6,2,1}; // Globes, start pose(when 6) not included
+        //   dice_result = v[i/4];
+        //   getchar();
+        // } else {
+        //   dice_result = 1;
+        // }
+        // i++;
     }
     int getDiceRoll() {return dice_result; }
     game();

@@ -4,6 +4,10 @@
 #include <iostream>
 #include "positions_and_dice.h"
 #include "game.h"
+#include <tuple>
+
+// State, Action, Token
+typedef std::tuple<int,int,int> state_action;
 
 
 class ludo_player_Qlearning : public QObject {
@@ -15,6 +19,7 @@ private:
     std::random_device rd;
     std::mt19937 gen;
     game* game_obj;
+    std::vector< std::vector<int> > QTable;
 
     int make_decision();
 public:
@@ -26,6 +31,9 @@ public slots:
     void start_turn(positions_and_dice relative);
     void post_game_analysis(std::vector<int> relative_pos);
     int get_current_state(int token_state);
+    state_action maxQ(std::vector<state_action> &possible_moves);
+    std::vector<int> get_possible_actions(int token_pose, int);
+
 };
 
 #endif // LUDO_PLAYER_QLEARNING_H

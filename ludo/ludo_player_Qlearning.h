@@ -7,7 +7,7 @@
 #include <tuple>
 
 // State, Action, Token
-typedef std::tuple<int,int,int,int> state_action;
+typedef std::tuple<int,int,int,int,float> state_action;
 
 
 class ludo_player_Qlearning : public QObject {
@@ -19,13 +19,15 @@ private:
     std::random_device rd;
     std::mt19937 gen;
     game* game_obj;
-    std::vector< std::vector<int> > QTable;
+    std::vector< std::vector<float> > QTable;
+    bool InSafety(int position);
 
     state_action last_move;
 
     int make_decision();
 public:
     ludo_player_Qlearning(game *game_obj);
+    std::vector<state_action> prev_token_positions;
 signals:
     void select_piece(int);
     void turn_complete(bool);
@@ -34,7 +36,11 @@ public slots:
     void post_game_analysis(std::vector<int> relative_pos);
     int get_current_state(int token_state);
     state_action maxQ(std::vector<state_action> &possible_moves);
-    std::vector<int> get_possible_actions(int token_pose, int);
+    state_action randomQ(std::vector<state_action> &possible_moves);
+    float CalculateImmediateReward(state_action & best_move);
+
+
+    std::vector<std::pair<int,float>> get_possible_actions(int token_pose, int);
 
 };
 

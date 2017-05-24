@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+
 #include <vector>
 #include <random>
 #include <iostream>
@@ -42,18 +43,24 @@ public:
     int color;
     std::vector<int> player_positions;
     void rollDice(){
-        static int i = 0;
-        std::uniform_int_distribution<> dis(1, 6);
-        dice_result = dis(gen);
-        // std::cout << "i: " <<  i << std::endl;
-        // if(i%4 == 0){
-        //   std::vector<int> v{ 6,6,6,6,6,6,6,6,2,1,6,6,6,6,6,6,6,6,2,1}; // Globes, start pose(when 6) not included
-        //   dice_result = v[i/4];
-        //   getchar();
-        // } else {
-        //   dice_result = 1;
-        // }
-        // i++;
+      #if 0
+        #warning "using random dice"
+         std::uniform_int_distribution<> dis(1, 6);
+         dice_result = dis(gen);
+      #else
+      #warning "using vector dice"
+      static int i = 0;
+        //std::cout << "i: " <<  i << std::endl;
+        if(i%4 == 0){
+          std::vector<int> v{ 6,6,6,6,6,6,6,6,2,6,6,6,6,6,6,6,6,2,1}; // Globes, start pose(when 6) not included
+          dice_result = v[i/4];
+          getchar();
+        } else {
+          dice_result = 1;
+        }
+        i++;
+
+      #endif
     }
     int getDiceRoll() {return dice_result; }
     game();

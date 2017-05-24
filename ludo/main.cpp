@@ -14,7 +14,6 @@ int main(int argc, char *argv[]){
     qRegisterMetaType<positions_and_dice>();
 
     game g;
-    g.setGameDelay(0); //if you want to see the game, set a delay
 
     //instanciate the players here
     ludo_player_Qlearning p1(&g);
@@ -23,13 +22,16 @@ int main(int argc, char *argv[]){
 
 
     // * Add a GUI <-- remove the '/' to uncomment block
-    // Dialog w;
-    // QObject::connect(&g,SIGNAL(update_graphics(std::vector<int>)),&w,SLOT(update_graphics(std::vector<int>)));
-    // QObject::connect(&g,SIGNAL(set_color(int)),                   &w,SLOT(get_color(int)));
-    // QObject::connect(&g,SIGNAL(set_dice_result(int)),             &w,SLOT(get_dice_result(int)));
-    // QObject::connect(&g,SIGNAL(declare_winner(int)),              &w,SLOT(get_winner()));
-    // QObject::connect(&g,SIGNAL(close()),&a,SLOT(quit()));
-    // w.show();
+    Dialog w;
+    #if 1
+      g.setGameDelay(0); //if you want to see the game, set a delay
+      QObject::connect(&g,SIGNAL(update_graphics(std::vector<int>)),&w,SLOT(update_graphics(std::vector<int>)));
+      QObject::connect(&g,SIGNAL(set_color(int)),                   &w,SLOT(get_color(int)));
+      QObject::connect(&g,SIGNAL(set_dice_result(int)),             &w,SLOT(get_dice_result(int)));
+      QObject::connect(&g,SIGNAL(declare_winner(int)),              &w,SLOT(get_winner()));
+      QObject::connect(&g,SIGNAL(close()),&a,SLOT(quit()));
+      w.show();
+    #endif
     QObject::connect(&g,SIGNAL(close()),&a,SLOT(quit()));
     //*/
 

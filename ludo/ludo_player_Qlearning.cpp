@@ -10,7 +10,6 @@
 #define ACTION(var)       std::get<1>(var)
 #define TOKEN(var)        std::get<2>(var)
 #define POSITION(var)     std::get<3>(var)
-#define REWARD(var)       std::get<4>(var)
 
 
 
@@ -120,53 +119,52 @@ int ludo_player_Qlearning::get_current_state(int token_state){
   }
   return state;
 }
-std::vector<std::pair<int,float>> ludo_player_Qlearning::get_possible_actions(int token_pose, int _dice_roll){
+int ludo_player_Qlearning::get_possible_action(int token_pose, int _dice_roll){
   float new_pose = token_pose + _dice_roll;
+  int action = -2;
 
-  std::vector<std::pair<int,float>> possible_actions;
   if(token_pose >= 56 ){ // if in goal, the token can't do anything
-    return possible_actions;
+    return -1; // no actions possible
   }
 
   if(new_pose  == (-1 + 6)){ // in home = -1, 6 to move out
-    possible_actions.push_back(std::make_pair(MOVE_OUT_FROM_HOME, 20));
-    return possible_actions;
+    action = MOVE_OUT_FROM_HOME;
   }
 
 
   if(new_pose == 50){ // 50 is star which jumps token to goal
-    possible_actions.push_back(std::make_pair(MOVE_TO_GOAL_VIA_STAR, 100));
-    return possible_actions;
+    action = MOVE_TO_GOAL_VIA_STAR;
   }
 
   if(InSafety(new_pose)){
-    possible_actions.push_back(std::make_pair(GET_INTO_SAFETY_WITH_AN_SAME_COLORED_TOKEN, 20));
+    action = GET_INTO_SAFETY_WITH_AN_SAME_COLORED_TOKEN;
   }
 
   if(new_pose == 56){ // 56 is actual goal,
     //getchar();
-    possible_actions.push_back(std::make_pair(MOVE_IN_GOAL, 50));
-    return possible_actions;
+    action = MOVE_IN_GOAL;
+    return action;
   }
 
-  if(is_star(new_pose)){
-    possible_actions.push_back(std::make_pair(MOVE_TO_STAR, 30));
+  if(is_star(new_pose) && token_pose != GAME_POSITION_HOME){
+    std::cout << "Is star"  << new_pose<< std::endl;
+    action = MOVE_TO_STAR;
   }
 
   if(new_pose > 50 and token_pose <= 50){ // If can move in goal road but currently isn't in goal road.
-    possible_actions.push_back(std::make_pair(GET_INTO_THE_WINNER_ROAD, 10));
+    action = GET_INTO_THE_WINNER_ROAD;
   }
 
   if( is_globe(new_pose) ){
-    possible_actions.push_back(std::make_pair(MOVE_TO_GLOBE, 30));
+    action = MOVE_TO_GLOBE;
   }
 
   // If no other actions are possible.
-  if(possible_actions.size() == 0 and token_pose != -1){
+  if(action == -2){
     //missing action with safe zone.
-    possible_actions.push_back(std::make_pair(JUST_MOVE,new_pose));
+    action = JUST_MOVE;
   }
-  return possible_actions;
+  return action;
 }
 
 std::string state_int_to_string(int token_state){
@@ -318,11 +316,13 @@ int ludo_player_Qlearning::make_decision(){
     int current_state = get_current_state(pos_start_of_turn[token_i]);
 
     // Calculate possible actions based on state and dice_roll
-    auto possible_actions = get_possible_actions(pos_start_of_turn[token_i], dice_roll);
+    auto possible_action = get_possible_action(pos_start_of_turn[token_i], dice_roll);
 
-    for(auto possible_action : possible_actions){
-      possiblePlayerMoves.push_back(std::make_tuple(current_state, possible_action.first, token_i,pos_start_of_turn[token_i], possible_action.second));
-    }
+    std::cout << "token#" << token_i << " action: " << possible_action << std::endl;
+    possiblePlayerMoves.push_back(std::make_tuple(current_state, possible_action, token_i, pos_start_of_turn[token_i]));
+    // for(auto possible_action : possible_actions){
+    //   possiblePlayerMoves.push_back(std::make_tuple(current_state, possible_actions.first, token_i,pos_start_of_turn[token_i], possible_action.second));
+    // }
   }
 
   for(auto possible_action : possiblePlayerMoves){
@@ -356,18 +356,8 @@ int ludo_player_Qlearning::make_decision(){
   }
 
   float immediate_reward = CalculateImmediateReward(current_pose);
-  //immediate_reward = 0.0;
   float a = 0.5;
   float lambda = 0.1;
-  /*
-  #define STATE(var)  std::get<0>(var)
-  #define ACTION(var)  std::get<1>(var)
-  #define TOKEN(var)  std::get<2>(var)
-  */
-
-  // std::cout << "\t" << " Last state: " << state_int_to_string(LAST_STATE(last_move)) << " Last action: " << action_int_to_string(LAST_ACTION(last_move)) << std::endl;
-  // std::cout << "\t" << " Best state: " << state_int_to_string(STATE(best_move)) << " Best action: " << action_int_to_string(ACTION(best_move)) << std::endl;
-
 
   std::cout << "\t" << " Best state: " << state_int_to_string(STATE(best_move)) << " Best action: " << action_int_to_string(ACTION(best_move)) << std::endl;
   std::cout << "\t" << " Cur. state: " << state_int_to_string(STATE(current_pose)) << " did action: " << action_int_to_string(ACTION(current_pose)) << std::endl;
@@ -379,17 +369,6 @@ int ludo_player_Qlearning::make_decision(){
   prev_token_positions[tokenToMove] = best_move;
   QTabledumper(QTable);
 
-  //prev_token_positions[TOKEN(best_move)] = best_move
-
-  //
-  // if(e_greedy() == EXPLOIT){
-  //   // From actions possible, select the best one
-  //   auto action = QTableLookup(possible_actions);
-  // } else { // EXPLORE
-  //   auto action = pick_random_action();
-  // }
-  //
-  // return action.player;
   return TOKEN(best_move);
 }
 

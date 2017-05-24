@@ -24,14 +24,15 @@ private:
     bool InSafety(int position);
 
     state_action last_move;
-    void dumpQTableToFile(int fileid);
-    void importQTableFromFile(int fileid);
+
 
 
     int make_decision();
 public:
     ludo_player_Qlearning(game *game_obj);
     std::vector<state_action> prev_token_positions;
+    void dumpQTableToFile(int fileid);
+    void importQTableFromFile(int fileid);
 signals:
     void select_piece(int);
     void turn_complete(bool);

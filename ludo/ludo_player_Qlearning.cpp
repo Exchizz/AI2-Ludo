@@ -20,6 +20,7 @@
 #define ST_STAR         3
 #define ST_WINNER_ROAD  4
 #define ST_FREESPACE    5
+#define ST_SAFE         6
 
 // Actions
 #define MOVE_OUT_FROM_HOME                          0
@@ -108,6 +109,10 @@ int ludo_player_Qlearning::get_current_state(int token_state){
     state = ST_HOME;
   }
 
+  if(InSafety(token_state)){
+    state = ST_SAFE;
+  }
+
   if(game_obj->isStar(token_state)){
     state = ST_STAR;
   }
@@ -186,6 +191,10 @@ std::string state_int_to_string(int token_state){
 
     case ST_WINNER_ROAD:
       state_str = "ST_WINNER_ROAD";
+    break;
+
+    case ST_SAFE:
+      state_str = "ST_SAFE";
     break;
 
     default:
@@ -344,7 +353,7 @@ int ludo_player_Qlearning::make_decision(){
   std::uniform_int_distribution<> dis(1, 100);
   int epsilon = dis(gen);
   state_action best_move;
-  if(epsilon >50){
+  if(epsilon >50 || true){
     // Get best action given all possible actions
     best_move = maxQ(possiblePlayerMoves);
   } else {

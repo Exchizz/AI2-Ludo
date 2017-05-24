@@ -69,5 +69,7 @@ int main(int argc, char *argv[]){
     }
 
     std::cout << "Winrate: " << (player_0_wins/1000.0)*100;
+    std::cout << "Save qtable" << std::endl;
+    p1.dumpQTableToFile(99999);
     return 0;
 }

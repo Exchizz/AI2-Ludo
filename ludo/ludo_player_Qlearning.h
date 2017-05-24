@@ -5,6 +5,7 @@
 #include "positions_and_dice.h"
 #include "game.h"
 #include <tuple>
+#include <fstream>
 
 // State, Action, Token
 typedef std::tuple<int,int,int,int> state_action;
@@ -23,6 +24,9 @@ private:
     bool InSafety(int position);
 
     state_action last_move;
+    void dumpQTableToFile();
+    void importQTableFromFile();
+
 
     int make_decision();
 public:

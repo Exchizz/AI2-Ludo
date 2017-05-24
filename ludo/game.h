@@ -52,7 +52,7 @@ public:
       static int i = 0;
         //std::cout << "i: " <<  i << std::endl;
         if(i%4 == 0){
-          std::vector<int> v{ 6,6,6,6,6,6,6,6,2,6,6,6,6,6,6,6,6,2,1}; // Globes, start pose(when 6) not included
+          std::vector<int> v{ 6,6,6,6,6,6,6,6,2,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6}; // Globes, start pose(when 6) not included
           dice_result = v[i/4];
           getchar();
         } else {

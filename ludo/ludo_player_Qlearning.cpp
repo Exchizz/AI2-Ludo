@@ -27,7 +27,7 @@
 #define MOVE_TO_GLOBE                               2
 #define MOVE_TO_STAR                                3
 #define MOVE_TO_GOAL_VIA_STAR                       4
-#define GET_INTO_SAFETY_WITH_AN_SAME_COLORED_TOKEN  5
+#define GET_INTO_SAFETY_WITH_A_SAME_COLORED_TOKEN  5
 #define GET_INTO_THE_WINNER_ROAD                    6
 #define SUICIDE_IF_THE_OPPONENT_IS_ON_A_GLOBE       7
 #define KILL_OPPONENT                               8
@@ -137,7 +137,7 @@ int ludo_player_Qlearning::get_possible_action(int token_pose, int _dice_roll){
   }
 
   if(InSafety(new_pose)){
-    action = GET_INTO_SAFETY_WITH_AN_SAME_COLORED_TOKEN;
+    action = GET_INTO_SAFETY_WITH_A_SAME_COLORED_TOKEN;
   }
 
   if(new_pose == 56){ // 56 is actual goal,
@@ -220,8 +220,8 @@ std::string action_int_to_string(int token_action){
       action_str = "MOVE_TO_GOAL_VIA_STAR";
     break;
 
-    case GET_INTO_SAFETY_WITH_AN_SAME_COLORED_TOKEN:
-      action_str = "GET_INTO_SAFETY_WITH_AN_SAME_COLORED_TOKEN";
+    case GET_INTO_SAFETY_WITH_A_SAME_COLORED_TOKEN:
+      action_str = "GET_INTO_SAFETY_WITH_A_SAME_COLORED_TOKEN";
     break;
 
     case GET_INTO_THE_WINNER_ROAD:
@@ -300,7 +300,7 @@ float ludo_player_Qlearning::CalculateImmediateReward(state_action & best_move){
     reward+=20;
   }
 
-  if(ACTION(best_move) == GET_INTO_SAFETY_WITH_AN_SAME_COLORED_TOKEN){
+  if(ACTION(best_move) == GET_INTO_SAFETY_WITH_A_SAME_COLORED_TOKEN){
     reward+=20;
   }
 
@@ -309,6 +309,14 @@ float ludo_player_Qlearning::CalculateImmediateReward(state_action & best_move){
 }
 
 int ludo_player_Qlearning::make_decision(){
+
+  static bool ImportQ = true;
+  if(ImportQ){
+    ImportQ = false;
+    std::cout << "-------------- Importing qtable from file" << std::endl;;
+    importQTableFromFile();
+    QTabledumper(QTable);
+  }
   std::vector<state_action>possiblePlayerMoves;
   // For each token
   for(int token_i = 0; token_i < 4; token_i++){
@@ -368,6 +376,10 @@ int ludo_player_Qlearning::make_decision(){
   std::cout << "tokenToMove: " << tokenToMove << " best_move's token: " << TOKEN(best_move)<< std::endl;
   prev_token_positions[tokenToMove] = best_move;
   QTabledumper(QTable);
+  static int k = 0;
+  if(k++ == 10){
+    dumpQTableToFile();
+  }
 
   return TOKEN(best_move);
 }
@@ -393,4 +405,34 @@ void ludo_player_Qlearning::post_game_analysis(std::vector<int> relative_pos){
         }
     }
     emit turn_complete(game_complete);
+}
+
+
+void ludo_player_Qlearning::dumpQTableToFile(){
+  std::cout << "Saving Qtable to file....." << std::endl;
+  std::ofstream outz("Qtable.txt");
+
+  if(!outz){
+    std::cout << "------------------------- Cannot save qtable" << std::endl;
+  }
+
+  for(const auto& row : QTable) {
+    std::copy(row.cbegin(), row.cend(), std::ostream_iterator<double>(outz, " "));
+  }
+  outz.close();
+}
+
+void ludo_player_Qlearning::importQTableFromFile(){
+  std::ifstream fin ("Qtable.txt");
+  if (fin.is_open()){
+    for (int state = 0; state < NUMBER_OF_STATES; state++){
+      for (int action = 0; action < NUMBER_OF_ACTIONS; action++){
+        float item = 0.0;
+        fin >> item;
+        std::cout << "item: " << item << std::endl;
+        QTable[state][action] = item;
+      }
+    }
+    fin.close();
+  }
 }

@@ -19,12 +19,11 @@ int main(int argc, char *argv[]){
     ludo_player_Qlearning p1(&g);
     ludo_player_random p2,p3, p4;
 
-
+g.setGameDelay(0);
 
     // * Add a GUI <-- remove the '/' to uncomment block
     Dialog w;
-    #if 1
-      g.setGameDelay(0); //if you want to see the game, set a delay
+    #if 0
       QObject::connect(&g,SIGNAL(update_graphics(std::vector<int>)),&w,SLOT(update_graphics(std::vector<int>)));
       QObject::connect(&g,SIGNAL(set_color(int)),                   &w,SLOT(get_color(int)));
       QObject::connect(&g,SIGNAL(set_dice_result(int)),             &w,SLOT(get_dice_result(int)));

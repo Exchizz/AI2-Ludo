@@ -27,14 +27,14 @@
 #define MOVE_TO_GLOBE                               2
 #define MOVE_TO_STAR                                3
 #define MOVE_TO_GOAL_VIA_STAR                       4
-#define GET_INTO_SAFETY_WITH_A_SAME_COLORED_TOKEN  5
+#define GET_INTO_SAFETY_WITH_A_SAME_COLORED_TOKEN   5
 #define GET_INTO_THE_WINNER_ROAD                    6
 #define SUICIDE_IF_THE_OPPONENT_IS_ON_A_GLOBE       7
 #define KILL_OPPONENT                               8
 #define JUST_MOVE                                   9
 
 bool is_star(int pos){
-  std::vector<int> v{ 5, 11, 18, 24, 31, 37, 44, 50}; // Globes, start pose(when 6) not included
+  std::vector<int> v{ 5, 11, 18, 24, 31, 37, 44, 50}; // stars, start pose(when 6) not included
   return (std::find(v.begin(), v.end(), pos) != v.end());
 }
 bool is_globe(int pos){
@@ -75,9 +75,7 @@ ludo_player_Qlearning::ludo_player_Qlearning(game *obj):
 
     // State 2, action 3 = 200;
     // QTable[2][3] = 200;
-    // QTable[ST_WINNER_ROAD][MOVE_IN_GOAL] = 100;
-    // QTable[ST_FREESPACE][MOVE_TO_GOAL_VIA_STAR] = 100;
-    // QTable[ST_FREESPACE][MOVE_IN_GOAL] = 100;
+
     prev_token_positions.resize(4); // Four tokens
 
     QTabledumper(QTable);
@@ -160,7 +158,7 @@ int ludo_player_Qlearning::get_possible_action(int token_pose, int _dice_roll){
   }
 
   // If no other actions are possible.
-  if(action == -2){
+  if(token_pose > -1 && action == -2){ // if token is out of home and no else action has been set.
     //missing action with safe zone.
     action = JUST_MOVE;
   }
@@ -240,7 +238,6 @@ std::string action_int_to_string(int token_action){
       action_str = "JUST_MOVE";
     break;
 
-
     default:
       std::cout << "UNDEFINED ACTION AT LINE" << __LINE__ << " function: " << __FUNCTION__ << std::endl;
   }
@@ -293,7 +290,7 @@ float ludo_player_Qlearning::CalculateImmediateReward(state_action & best_move){
   }
 
   if(ACTION(best_move) == MOVE_OUT_FROM_HOME){
-    reward+=10;
+    reward+=50;
   }
 
   if(ACTION(best_move) == MOVE_TO_STAR){
@@ -314,7 +311,7 @@ int ludo_player_Qlearning::make_decision(){
   if(ImportQ){
     ImportQ = false;
     std::cout << "-------------- Importing qtable from file" << std::endl;;
-    importQTableFromFile(20);
+    importQTableFromFile(9000);
     QTabledumper(QTable);
   }
   std::vector<state_action>possiblePlayerMoves;
@@ -327,9 +324,15 @@ int ludo_player_Qlearning::make_decision(){
     auto possible_action = get_possible_action(pos_start_of_turn[token_i], dice_roll);
 
     std::cout << "token#" << token_i << " action: " << possible_action << std::endl;
-    possiblePlayerMoves.push_back(std::make_tuple(current_state, possible_action, token_i, pos_start_of_turn[token_i]));
+    if(possible_action >= 0){
+      possiblePlayerMoves.push_back(std::make_tuple(current_state, possible_action, token_i, pos_start_of_turn[token_i]));
+    }
   }
 
+  if(possiblePlayerMoves.size() == 0){
+    std::cout << "No move can be done" << std::endl;
+    return 0;
+  }
   for(auto possible_action : possiblePlayerMoves){
     std::cout << "Token: " << TOKEN(possible_action) << " can do action " << action_int_to_string(ACTION(possible_action)) << std::endl;
   }
@@ -337,7 +340,7 @@ int ludo_player_Qlearning::make_decision(){
   std::uniform_int_distribution<> dis(1, 100);
   int epsilon = dis(gen);
   state_action best_move;
-  if(true){
+  if(epsilon > 70){
     // Get best action given all possible actions
     best_move = maxQ(possiblePlayerMoves);
   } else {
@@ -373,19 +376,29 @@ int ludo_player_Qlearning::make_decision(){
   std::cout << "tokenToMove: " << tokenToMove << " best_move's token: " << TOKEN(best_move)<< std::endl;
   prev_token_positions[tokenToMove] = best_move;
   QTabledumper(QTable);
-  static int k = 0;
-  if(k % 5 == 0){
-    dumpQTableToFile(k);
-  }
-  k++;
+
 
   return TOKEN(best_move);
 }
 
 void ludo_player_Qlearning::start_turn(positions_and_dice relative){
+    static int k = 0;
     pos_start_of_turn = relative.pos;
+
+
+    if(pos_start_of_turn[0] == -1 && pos_start_of_turn[1] == -1 && pos_start_of_turn[2] == -1 && pos_start_of_turn[3] == -1){
+    std::cout << "--------------------- Game reset-----------------------" << std::endl;
+      if(k % 500 == 0){
+        dumpQTableToFile(k);
+      }
+      k++;
+    }
+
     dice_roll = relative.dice;
     int decision = make_decision();
+
+
+
     emit select_piece(decision);
 }
 

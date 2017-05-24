@@ -43,7 +43,7 @@ public:
     int color;
     std::vector<int> player_positions;
     void rollDice(){
-      #if 0
+      #if 1
         #warning "using random dice"
          std::uniform_int_distribution<> dis(1, 6);
          dice_result = dis(gen);
@@ -52,7 +52,8 @@ public:
       static int i = 0;
         //std::cout << "i: " <<  i << std::endl;
         if(i%4 == 0){
-          std::vector<int> v{ 6,6,6,6,6,6,6,6,2,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6}; // Globes, start pose(when 6) not included
+          //std::vector<int> v{ 6,6,6,6,6,6,6,6,2,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6}; // Globes, start pose(when 6) not included
+          std::vector<int> v {2,3,6,4,4,4,4,4,4,4,4,4,4,4,5,5,1,1,1,6,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2};
           dice_result = v[i/4];
           getchar();
         } else {

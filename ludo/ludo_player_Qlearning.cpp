@@ -310,11 +310,11 @@ float ludo_player_Qlearning::CalculateImmediateReward(state_action & best_move){
 
 int ludo_player_Qlearning::make_decision(){
 
-  static bool ImportQ = true;
+  static bool ImportQ = false;
   if(ImportQ){
     ImportQ = false;
     std::cout << "-------------- Importing qtable from file" << std::endl;;
-    importQTableFromFile();
+    importQTableFromFile(20);
     QTabledumper(QTable);
   }
   std::vector<state_action>possiblePlayerMoves;
@@ -328,9 +328,6 @@ int ludo_player_Qlearning::make_decision(){
 
     std::cout << "token#" << token_i << " action: " << possible_action << std::endl;
     possiblePlayerMoves.push_back(std::make_tuple(current_state, possible_action, token_i, pos_start_of_turn[token_i]));
-    // for(auto possible_action : possible_actions){
-    //   possiblePlayerMoves.push_back(std::make_tuple(current_state, possible_actions.first, token_i,pos_start_of_turn[token_i], possible_action.second));
-    // }
   }
 
   for(auto possible_action : possiblePlayerMoves){
@@ -377,9 +374,10 @@ int ludo_player_Qlearning::make_decision(){
   prev_token_positions[tokenToMove] = best_move;
   QTabledumper(QTable);
   static int k = 0;
-  if(k++ == 10){
-    dumpQTableToFile();
+  if(k % 5 == 0){
+    dumpQTableToFile(k);
   }
+  k++;
 
   return TOKEN(best_move);
 }
@@ -408,9 +406,9 @@ void ludo_player_Qlearning::post_game_analysis(std::vector<int> relative_pos){
 }
 
 
-void ludo_player_Qlearning::dumpQTableToFile(){
+void ludo_player_Qlearning::dumpQTableToFile(int fileid){
   std::cout << "Saving Qtable to file....." << std::endl;
-  std::ofstream outz("Qtable.txt");
+  std::ofstream outz(std::string("Qtable") + std::to_string(fileid) + std::string(".txt"));
 
   if(!outz){
     std::cout << "------------------------- Cannot save qtable" << std::endl;
@@ -422,8 +420,8 @@ void ludo_player_Qlearning::dumpQTableToFile(){
   outz.close();
 }
 
-void ludo_player_Qlearning::importQTableFromFile(){
-  std::ifstream fin ("Qtable.txt");
+void ludo_player_Qlearning::importQTableFromFile(int fileid){
+  std::ifstream fin (std::string("Qtable") + std::to_string(fileid) + std::string(".txt"));
   if (fin.is_open()){
     for (int state = 0; state < NUMBER_OF_STATES; state++){
       for (int action = 0; action < NUMBER_OF_ACTIONS; action++){

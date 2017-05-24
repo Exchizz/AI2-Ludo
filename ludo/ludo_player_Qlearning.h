@@ -24,8 +24,8 @@ private:
     bool InSafety(int position);
 
     state_action last_move;
-    void dumpQTableToFile();
-    void importQTableFromFile();
+    void dumpQTableToFile(int fileid);
+    void importQTableFromFile(int fileid);
 
 
     int make_decision();

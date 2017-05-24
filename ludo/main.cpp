@@ -19,7 +19,7 @@ int main(int argc, char *argv[]){
     ludo_player_Qlearning p1(&g);
     ludo_player_random p2,p3, p4;
 
-g.setGameDelay(0);
+    g.setGameDelay(0);
 
     // * Add a GUI <-- remove the '/' to uncomment block
     Dialog w;
@@ -58,6 +58,7 @@ g.setGameDelay(0);
     for(int i = 0; i < 1000; ++i){
         g.start();
         a.exec();
+        while (a.closingDown()){}
         g.reset();
     }
     int player_0_wins = 0;

@@ -255,7 +255,7 @@ state_action ludo_player_Qlearning::randomQ(std::vector<state_action> &possible_
 
   std::uniform_int_distribution<> dis(1, possible_moves.size());
   int random_action = dis(gen);
-
+  std::cout << "Random action: " << random_action << action_int_to_string(ACTION(possible_moves[random_action-1])) << std::endl;
 
   return possible_moves[random_action-1];
 }
@@ -290,15 +290,19 @@ float ludo_player_Qlearning::CalculateImmediateReward(state_action & best_move){
   }
 
   if(ACTION(best_move) == MOVE_OUT_FROM_HOME){
+    reward+=100;
+  }
+
+  if(ACTION(best_move) == GET_INTO_THE_WINNER_ROAD){
     reward+=50;
   }
 
   if(ACTION(best_move) == MOVE_TO_STAR){
-    reward+=20;
+    reward+=80;
   }
 
   if(ACTION(best_move) == GET_INTO_SAFETY_WITH_A_SAME_COLORED_TOKEN){
-    reward+=20;
+    reward+=100;
   }
 
   std::cout << "Reward: " << reward << std::endl;
@@ -340,7 +344,7 @@ int ludo_player_Qlearning::make_decision(){
   std::uniform_int_distribution<> dis(1, 100);
   int epsilon = dis(gen);
   state_action best_move;
-  if(epsilon > 70){
+  if(epsilon >50){
     // Get best action given all possible actions
     best_move = maxQ(possiblePlayerMoves);
   } else {
@@ -374,7 +378,7 @@ int ludo_player_Qlearning::make_decision(){
   lambda*QTable[STATE(best_move)][ACTION(best_move)] - QTable[STATE(current_pose)][ACTION(best_move)]);
 
   std::cout << "tokenToMove: " << tokenToMove << " best_move's token: " << TOKEN(best_move)<< std::endl;
-  prev_token_positions[tokenToMove] = best_move;
+  //prev_token_positions[tokenToMove] = best_move;
   QTabledumper(QTable);
 
 

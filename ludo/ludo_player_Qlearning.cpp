@@ -76,7 +76,7 @@ ludo_player_Qlearning::ludo_player_Qlearning(game *obj):
     // State 2, action 3 = 200;
     // QTable[2][3] = 200;
     if(false){
-      std::cout << "-------------- Importing qtable from file" << std::endl;
+      std::cerr << "-------------- Importing qtable from file" << std::endl;
 
       QTabledumper(QTable);
       importQTableFromFile(99999);
@@ -297,6 +297,7 @@ float ludo_player_Qlearning::CalculateImmediateReward(state_action & best_move){
   }
 
   if(ACTION(best_move) == MOVE_TO_SAFETY){
+    std::cerr << "Reward for moving to safety" << std::endl;
     reward+=100;
   }
 
@@ -317,6 +318,8 @@ int ludo_player_Qlearning::make_decision(){
 
     // std::cout << "token#" << token_i << " action: " << possible_action << std::endl;
     if(possible_action >= 0){
+      // std::cerr << "Possible action: " << action_int_to_string(possible_action) << std::endl;
+
       possiblePlayerMoves.push_back(std::make_tuple(current_state, possible_action, token_i, pos_start_of_turn[token_i]));
     }
   }
@@ -332,7 +335,7 @@ int ludo_player_Qlearning::make_decision(){
   std::uniform_int_distribution<> dis(1, 100);
   int epsilon = dis(gen);
   state_action best_move;
-  if(epsilon < 70 || true ){
+  if(epsilon < 70 ){
     // Get best action given all possible actions
     best_move = maxQ(possiblePlayerMoves);
   } else {
@@ -354,7 +357,7 @@ int ludo_player_Qlearning::make_decision(){
   }
 
   float immediate_reward = CalculateImmediateReward(current_pose);
-  float a = 0.2;
+  float a = 0.4; //0.4
   float lambda = 0.1;
 
   // std::cout << "\t" << " Best state: " << state_int_to_string(STATE(best_move)) << " Best action: " << action_int_to_string(ACTION(best_move)) << std::endl;
@@ -364,10 +367,7 @@ int ludo_player_Qlearning::make_decision(){
   lambda*QTable[STATE(best_move)][ACTION(best_move)] - QTable[STATE(current_pose)][ACTION(best_move)]);
 
   std::cout << "tokenToMove: " << tokenToMove << " best_move's token: " << TOKEN(best_move)<< std::endl;
-  //prev_token_positions[tokenToMove] = best_move;
-  QTabledumper(QTable);
-
-
+  //QTabledumper(QTable);
   return TOKEN(best_move);
 }
 
@@ -408,7 +408,7 @@ void ludo_player_Qlearning::dumpQTableToFile(int fileid){
 }
 
 void ludo_player_Qlearning::importQTableFromFile(int fileid){
-  std::ifstream fin (std::string("outputs/Qtable") + std::to_string(fileid) + std::string(".txt"));
+  std::ifstream fin (std::string("outputs/learn-5000ittr/Qtable") + std::to_string(fileid) + std::string(".txt"));
   if (fin.is_open()){
     for (int state = 0; state < NUMBER_OF_STATES; state++){
       for (int action = 0; action < NUMBER_OF_ACTIONS; action++){
@@ -418,5 +418,7 @@ void ludo_player_Qlearning::importQTableFromFile(int fileid){
       }
     }
     fin.close();
+  } else {
+    std::cerr << "Unable to read qtable file" << std::endl;
   }
 }

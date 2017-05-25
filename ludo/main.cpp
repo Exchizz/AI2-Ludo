@@ -60,7 +60,7 @@ int main(int argc, char *argv[]){
     QObject::connect(&p4,SIGNAL(turn_complete(bool)),              &g, SLOT(turnComplete(bool)));
 
 
-    int turns = 4000;
+    int turns = 2000;
     std::ofstream tokenStatsFile;
     tokenStatsFile.open ("outputs/tokensInGoal.csv");
     unsigned int counter = 1;

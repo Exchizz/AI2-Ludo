@@ -1,6 +1,6 @@
 #include "ludo_player_Qlearning.h"
 
-#define NUMBER_OF_STATES    6
+#define NUMBER_OF_STATES    7
 #define NUMBER_OF_ACTIONS   10
 
 #define GAME_POSITION_HOME -1
@@ -81,23 +81,108 @@ ludo_player_Qlearning::ludo_player_Qlearning(game *obj):
 
     QTabledumper(QTable);
   }
+  std::string state_int_to_string(int token_state){
+    std::string state_str;
+    switch(token_state){
+      case ST_HOME:
+        state_str = "ST_HOME";
+      break;
 
-bool ludo_player_Qlearning::InSafety(int position){
+      case ST_GOAL:
+        state_str = "ST_GOAL";
+      break;
+
+      case ST_GLOBE:
+        state_str = "ST_GLOBE";
+      break;
+
+      case ST_STAR:
+        state_str = "ST_STAR";
+      break;
+
+      case ST_WINNER_ROAD:
+        state_str = "ST_WINNER_ROAD";
+      break;
+
+      case ST_SAFE:
+        state_str = "ST_SAFE";
+      break;
+
+      default:
+        state_str = "ST_FREESPACE";
+      break;
+    }
+
+    return state_str;
+  }
+  std::string action_int_to_string(int token_action){
+    std::string action_str;
+    switch(token_action){
+      case MOVE_OUT_FROM_HOME:
+        action_str = "MOVE_OUT_FROM_HOME";
+      break;
+
+      case MOVE_IN_GOAL:
+        action_str = "MOVE_IN_GOAL";
+      break;
+
+      case MOVE_TO_GLOBE:
+        action_str = "MOVE_TO_GLOBE";
+      break;
+
+      case MOVE_TO_STAR:
+        action_str = "MOVE_TO_STAR";
+      break;
+
+      case MOVE_TO_GOAL_VIA_STAR:
+        action_str = "MOVE_TO_GOAL_VIA_STAR";
+      break;
+
+      case GET_INTO_SAFETY_WITH_A_SAME_COLORED_TOKEN:
+        action_str = "GET_INTO_SAFETY_WITH_A_SAME_COLORED_TOKEN";
+      break;
+
+      case GET_INTO_THE_WINNER_ROAD:
+        action_str = "GET_INTO_THE_WINNER_ROAD";
+      break;
+
+      case SUICIDE_IF_THE_OPPONENT_IS_ON_A_GLOBE:
+        action_str = "SUICIDE_IF_THE_OPPONENT_IS_ON_A_GLOBE";
+      break;
+
+      case KILL_OPPONENT:
+        action_str = "KILL_OPPONENT";
+      break;
+
+      case JUST_MOVE:
+        action_str = "JUST_MOVE";
+      break;
+
+      default:
+        std::cout << "UNDEFINED ACTION AT LINE" << __LINE__ << " function: " << __FUNCTION__ << std::endl;
+    }
+
+    return action_str;
+  }
+
+
+bool ludo_player_Qlearning::InSafety(int position, int token){
   for(int i = 0; i < 4; i++){
     if(pos_start_of_turn[i] > 0 && pos_start_of_turn[i] < 50){ // if out in freespace, and not in goalzone.
-      if(pos_start_of_turn[i] == position){
+      if(pos_start_of_turn[i] == position && i != token){
         return true;
       }
     }
   }
   return false;
 }
-int ludo_player_Qlearning::get_current_state(int token_state){
+int ludo_player_Qlearning::get_current_state(int token_state, int token){
   int state = ST_FREESPACE;
 
   // If token is out and is on globe
   // Might divide this up later..
-  if( token_state > 0 && game_obj->isGlobe(token_state) ){
+  if( token_state > 0 && is_globe(token_state) ){
+    std::cout << "IN GLOBE STATE" << std::endl;
     state = ST_GLOBE;
   }
 
@@ -109,7 +194,8 @@ int ludo_player_Qlearning::get_current_state(int token_state){
     state = ST_HOME;
   }
 
-  if(InSafety(token_state)){
+  if(InSafety(token_state,token)){
+    std::cout << "in action safe and: " << state_int_to_string(state) << std::endl;
     state = ST_SAFE;
   }
 
@@ -122,7 +208,7 @@ int ludo_player_Qlearning::get_current_state(int token_state){
   }
   return state;
 }
-int ludo_player_Qlearning::get_possible_action(int token_pose, int _dice_roll){
+int ludo_player_Qlearning::get_possible_action(int token_pose, int _dice_roll,int token){
   float new_pose = token_pose + _dice_roll;
   int action = -2;
 
@@ -139,7 +225,7 @@ int ludo_player_Qlearning::get_possible_action(int token_pose, int _dice_roll){
     action = MOVE_TO_GOAL_VIA_STAR;
   }
 
-  if(InSafety(new_pose)){
+  if(InSafety(new_pose,token)){
     action = GET_INTO_SAFETY_WITH_A_SAME_COLORED_TOKEN;
   }
 
@@ -168,90 +254,6 @@ int ludo_player_Qlearning::get_possible_action(int token_pose, int _dice_roll){
     action = JUST_MOVE;
   }
   return action;
-}
-
-std::string state_int_to_string(int token_state){
-  std::string state_str;
-  switch(token_state){
-    case ST_HOME:
-      state_str = "ST_HOME";
-    break;
-
-    case ST_GOAL:
-      state_str = "ST_GOAL";
-    break;
-
-    case ST_GLOBE:
-      state_str = "ST_GLOBE";
-    break;
-
-    case ST_STAR:
-      state_str = "ST_STAR";
-    break;
-
-    case ST_WINNER_ROAD:
-      state_str = "ST_WINNER_ROAD";
-    break;
-
-    case ST_SAFE:
-      state_str = "ST_SAFE";
-    break;
-
-    default:
-      state_str = "ST_FREESPACE";
-    break;
-  }
-
-  return state_str;
-}
-std::string action_int_to_string(int token_action){
-  std::string action_str;
-  switch(token_action){
-    case MOVE_OUT_FROM_HOME:
-      action_str = "MOVE_OUT_FROM_HOME";
-    break;
-
-    case MOVE_IN_GOAL:
-      action_str = "MOVE_IN_GOAL";
-    break;
-
-    case MOVE_TO_GLOBE:
-      action_str = "MOVE_TO_GLOBE";
-    break;
-
-    case MOVE_TO_STAR:
-      action_str = "MOVE_TO_STAR";
-    break;
-
-    case MOVE_TO_GOAL_VIA_STAR:
-      action_str = "MOVE_TO_GOAL_VIA_STAR";
-    break;
-
-    case GET_INTO_SAFETY_WITH_A_SAME_COLORED_TOKEN:
-      action_str = "GET_INTO_SAFETY_WITH_A_SAME_COLORED_TOKEN";
-    break;
-
-    case GET_INTO_THE_WINNER_ROAD:
-      action_str = "GET_INTO_THE_WINNER_ROAD";
-    break;
-
-    case SUICIDE_IF_THE_OPPONENT_IS_ON_A_GLOBE:
-      action_str = "SUICIDE_IF_THE_OPPONENT_IS_ON_A_GLOBE";
-    break;
-
-    case KILL_OPPONENT:
-      action_str = "KILL_OPPONENT";
-    break;
-
-    case JUST_MOVE:
-      action_str = "JUST_MOVE";
-    break;
-
-    default:
-      std::cout << "UNDEFINED ACTION AT LINE" << __LINE__ << " function: " << __FUNCTION__ << std::endl;
-  }
-
-  return action_str;
 }
 
 
@@ -324,17 +326,17 @@ int ludo_player_Qlearning::make_decision(){
   if(ImportQ){
     ImportQ = false;
     std::cout << "-------------- Importing qtable from file" << std::endl;;
-    importQTableFromFile(9000);
+    importQTableFromFile(99999);
     QTabledumper(QTable);
   }
   std::vector<state_action>possiblePlayerMoves;
   // For each token
   for(int token_i = 0; token_i < 4; token_i++){
     // Get current state
-    int current_state = get_current_state(pos_start_of_turn[token_i]);
+    int current_state = get_current_state(pos_start_of_turn[token_i],token_i);
 
     // Calculate possible actions based on state and dice_roll
-    auto possible_action = get_possible_action(pos_start_of_turn[token_i], dice_roll);
+    auto possible_action = get_possible_action(pos_start_of_turn[token_i], dice_roll,token_i);
 
     std::cout << "token#" << token_i << " action: " << possible_action << std::endl;
     if(possible_action >= 0){
@@ -353,7 +355,7 @@ int ludo_player_Qlearning::make_decision(){
   std::uniform_int_distribution<> dis(1, 100);
   int epsilon = dis(gen);
   state_action best_move;
-  if(epsilon >50 || true){
+  if(epsilon < 70 ){
     // Get best action given all possible actions
     best_move = maxQ(possiblePlayerMoves);
   } else {
@@ -395,33 +397,20 @@ int ludo_player_Qlearning::make_decision(){
 }
 
 void ludo_player_Qlearning::start_turn(positions_and_dice relative){
-    static int k = 0;
     pos_start_of_turn = relative.pos;
 
 
-    if(pos_start_of_turn[0] == -1 && pos_start_of_turn[1] == -1 && pos_start_of_turn[2] == -1 && pos_start_of_turn[3] == -1){
-    std::cout << "--------------------- Game reset-----------------------" << std::endl;
-      if(k % 500 == 0){
-        dumpQTableToFile(k);
-      }
-      k++;
-    }
 
     dice_roll = relative.dice;
     int decision = make_decision();
-
-
 
     emit select_piece(decision);
 }
 
 void ludo_player_Qlearning::post_game_analysis(std::vector<int> relative_pos){
     pos_end_of_turn = relative_pos;
-    //
-    // for(int i = 0; i < 4; i++){
-    //   auto current_state = get_current_state(pos_end_of_turn[i]);
-    //   std::cout << "post current state: " << state_int_to_string(current_state) << std::endl;
-    // }
+
+
     bool game_complete = true;
     for(int i = 0; i < 4; ++i){
         if(pos_end_of_turn[i] < 99){
@@ -434,7 +423,7 @@ void ludo_player_Qlearning::post_game_analysis(std::vector<int> relative_pos){
 
 void ludo_player_Qlearning::dumpQTableToFile(int fileid){
   std::cout << "Saving Qtable to file....." << std::endl;
-  std::ofstream outz(std::string("Qtable") + std::to_string(fileid) + std::string(".txt"));
+  std::ofstream outz(std::string("outputs/Qtable") + std::to_string(fileid) + std::string(".txt"));
 
   if(!outz){
     std::cout << "------------------------- Cannot save qtable" << std::endl;
@@ -447,7 +436,7 @@ void ludo_player_Qlearning::dumpQTableToFile(int fileid){
 }
 
 void ludo_player_Qlearning::importQTableFromFile(int fileid){
-  std::ifstream fin (std::string("Qtable") + std::to_string(fileid) + std::string(".txt"));
+  std::ifstream fin (std::string("outputs/Qtable") + std::to_string(fileid) + std::string(".txt"));
   if (fin.is_open()){
     for (int state = 0; state < NUMBER_OF_STATES; state++){
       for (int action = 0; action < NUMBER_OF_ACTIONS; action++){

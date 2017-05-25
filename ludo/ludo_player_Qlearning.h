@@ -21,7 +21,7 @@ private:
     std::mt19937 gen;
     game* game_obj;
     std::vector< std::vector<float> > QTable;
-    bool InSafety(int position);
+    bool InSafety(int position, int token);
 
     state_action last_move;
 
@@ -39,13 +39,13 @@ signals:
 public slots:
     void start_turn(positions_and_dice relative);
     void post_game_analysis(std::vector<int> relative_pos);
-    int get_current_state(int token_state);
+    int get_current_state(int token_state,int token);
     state_action maxQ(std::vector<state_action> &possible_moves);
     state_action randomQ(std::vector<state_action> &possible_moves);
     float CalculateImmediateReward(state_action & best_move);
 
 
-    int get_possible_action(int token_pose, int);
+    int get_possible_action(int token_pose, int dice, int token);
 
 };
 

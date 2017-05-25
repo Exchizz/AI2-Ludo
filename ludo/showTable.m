@@ -1,16 +1,15 @@
-close all; clear; clc
+close all; clc; clear;
 
-data = importfile('build/Qtable8500.txt');
-qtable = zeros(6,10);
-for i = 0:5
+data = importfile('build/Qtable99999.txt');
+
+qtable = zeros(7,10);
+
+for i = 0:6
     qtable(1+i,:) = table2array(data(1,i*10+1:i*10+10));
 end
-%%
-fprintf("MOVE_OUT_FROM_HOME\t ok");
-qtable
-%%
-clc
-LastName = {'ST_HOME';'ST_GOAL';'ST_GLOBE';'ST_STAR';'ST_WINNER_ROAD';'ST_FREESPACE'};
+
+
+LastName = {'ST_HOME';'ST_GOAL';'ST_GLOBE';'ST_STAR';'ST_WINNER_ROAD';'ST_FREESPACE'; 'ST_SAFE'};
 
 MOVE_OUT_FROM_HOME = qtable(:,1);
 MOVE_IN_GOAL = qtable(:,2);

@@ -1,6 +1,6 @@
 close all; clear; clc;
 
-data = csvread('build/tokensInGoal.csv',1);
+data = csvread('build/outputs/tokensInGoal.csv',1);
 
 player1 = data(:,1);
 player2 = data(:,2);

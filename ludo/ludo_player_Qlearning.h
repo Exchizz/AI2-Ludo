@@ -30,7 +30,6 @@ private:
     int make_decision();
 public:
     ludo_player_Qlearning(game *game_obj);
-    std::vector<state_action> prev_token_positions;
     void dumpQTableToFile(int fileid);
     void importQTableFromFile(int fileid);
 signals:

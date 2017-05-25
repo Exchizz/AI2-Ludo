@@ -60,11 +60,12 @@ int main(int argc, char *argv[]){
     QObject::connect(&p4,SIGNAL(turn_complete(bool)),              &g, SLOT(turnComplete(bool)));
 
 
+    int turns = 4000;
     std::ofstream tokenStatsFile;
     tokenStatsFile.open ("outputs/tokensInGoal.csv");
     unsigned int counter = 1;
     tokenStatsFile << "Player1, Player2, Player3, Player4" << std::endl;
-    for(int i = 0; i < 1000; ++i){
+    for(int i = 0; i < turns; ++i){
       std::vector<int>player_stats{0,0,0,0};
 
         g.start();
@@ -78,8 +79,6 @@ int main(int argc, char *argv[]){
         }
         counter++;
         // Write q-table to file //
-
-
 
         // Write tokens to file //
         for(int k = 0; k < 16; k++){
@@ -101,7 +100,7 @@ int main(int argc, char *argv[]){
       }
     }
 
-    std::cout << "Winrate: " << (player_0_wins/1000.0)*100 << "%" << std::endl;
+    std::cerr << "Winrate: " << (player_0_wins/(float)turns)*100 << "%" << std::endl;
     std::cout << "Save qtable" << std::endl;
     p1.dumpQTableToFile(99999);
     return 0;

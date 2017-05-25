@@ -1,7 +1,7 @@
-close all; clc; clear;
+close all; clc;
 
-data = importfile('build/Qtable99999.txt');
-
+%data = importfile('build/outputs/Qtable99999.txt');
+data = Qtable99999;
 qtable = zeros(7,10);
 
 for i = 0:6

@@ -75,11 +75,11 @@ ludo_player_Qlearning::ludo_player_Qlearning(game *obj):
 
     // State 2, action 3 = 200;
     // QTable[2][3] = 200;
-    if(false){
+    if(true){
       std::cerr << "-------------- Importing qtable from file" << std::endl;
 
       QTabledumper(QTable);
-      importQTableFromFile(99999);
+      importQTableFromFile(0);
       QTabledumper(QTable);
     }
 }
@@ -297,8 +297,8 @@ float ludo_player_Qlearning::CalculateImmediateReward(state_action & best_move){
   }
 
   if(ACTION(best_move) == MOVE_TO_SAFETY){
-    std::cerr << "Reward for moving to safety" << std::endl;
-    reward+=100;
+    //std::cerr << "Reward for moving to safety" << std::endl;
+    reward+=10;
   }
 
   std::cout << "Reward: " << reward << std::endl;
@@ -335,7 +335,7 @@ int ludo_player_Qlearning::make_decision(){
   std::uniform_int_distribution<> dis(1, 100);
   int epsilon = dis(gen);
   state_action best_move;
-  if(epsilon < 70 ){
+  if(epsilon < 0 || true ){
     // Get best action given all possible actions
     best_move = maxQ(possiblePlayerMoves);
   } else {
@@ -357,7 +357,7 @@ int ludo_player_Qlearning::make_decision(){
   }
 
   float immediate_reward = CalculateImmediateReward(current_pose);
-  float a = 0.4; //0.4
+  float a = 0; //0.4 //a = 0 means don't learn, just use.
   float lambda = 0.1;
 
   // std::cout << "\t" << " Best state: " << state_int_to_string(STATE(best_move)) << " Best action: " << action_int_to_string(ACTION(best_move)) << std::endl;
@@ -408,7 +408,7 @@ void ludo_player_Qlearning::dumpQTableToFile(int fileid){
 }
 
 void ludo_player_Qlearning::importQTableFromFile(int fileid){
-  std::ifstream fin (std::string("outputs/learn-5000ittr/Qtable") + std::to_string(fileid) + std::string(".txt"));
+  std::ifstream fin (std::string("Qtable") + std::to_string(fileid) + std::string(".txt"));
   if (fin.is_open()){
     for (int state = 0; state < NUMBER_OF_STATES; state++){
       for (int action = 0; action < NUMBER_OF_ACTIONS; action++){
